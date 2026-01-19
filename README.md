@@ -2,6 +2,17 @@
 
 A comprehensive web-based civic complaint management system that enables citizens to report municipal issues and track their resolution through a centralized platform.
 
+
+# To Run The Project
+git clone <your-repo-url>
+cd complaint-system/backend
+npm install
+node server.js
+
+cd ../frontend
+npm install
+npm start
+
 ## 🎯 Features
 
 ### User Authentication & Authorization

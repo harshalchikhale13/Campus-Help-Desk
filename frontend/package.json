@@ -2,6 +2,7 @@
   "name": "civic-complaint-frontend",
   "version": "1.0.0",
   "description": "React frontend for Civic Complaint Management System",
+  "homepage": "https://harshalchikhale13.github.io/City-Help-Desk",
   "private": true,
   "dependencies": {
     "axios": "^1.6.0",
