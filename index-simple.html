@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Civic Complaint System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        nav { background: white; padding: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        nav h1 { color: #0066cc; }
+        .btn { padding: 10px 20px; background: #0066cc; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        .btn:hover { background: #0052a3; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .message { padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>🏛️ City-Help Desk</h1>
+        <button class="btn" onclick="logout()">Logout</button>
+    </nav>
+
+    <div class="container">
+        <div id="message"></div>
+
+        <div id="loginForm" class="card">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input id="loginEmail" type="email" value="citizen@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input id="loginPassword" type="password" value="Password123!">
+            </div>
+            <button class="btn" onclick="login()">Login</button>
+        </div>
+
+        <div id="mainApp" style="display:none;">
+            <div class="card">
+                <h2>Create New Complaint</h2>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="category">
+                        <option>Garbage</option>
+                        <option>Road</option>
+                        <option>Water</option>
+                        <option>Electricity</option>
+                        <option>Drainage</option>
+                        <option>Public_Safety</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="description" rows="5" placeholder="Describe the issue..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Location Address</label>
+                    <input id="location" type="text" placeholder="Enter location">
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="priority">
+                        <option>low</option>
+                        <option>medium</option>
+                        <option>high</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="createComplaint()">Submit Complaint</button>
+            </div>
+
+            <h2>Your Complaints</h2>
+            <div id="complaintsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('token');
+
+        if (token) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadComplaints();
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/users/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                if (data.data.token) {
+                    token = data.data.token;
+                    localStorage.setItem('token', token);
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    showMessage('Login successful!', 'success');
+                    loadComplaints();
+                } else {
+                    showMessage('Login failed', 'error');
+                }
+            } catch (e) {
+                showMessage('Error: ' + e.message, 'error');
+            }
+        }
+
+        async function createComplaint() {
+            const data = {
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                locationAddress: document.getElementById('location').value,
+                priority: document.getElementById('priority').value,
+                latitude: '28.7041',
+                longitude: '77.1025'
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/complaints`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showMessage('Complaint submitted successfully!', 'success');
+                    document.getElementById('description').value = '';
+                    document.getElementById('location').value = '';
+                    loadComplaints();
+                } else {
+                    showMessage('Failed to submit complaint', 'error');
+                }
+            } catch (e) {
+                showMessage('Error: ' + e.message, 'error');
+            }
+        }
+
+        async function loadComplaints() {
+            try {
+                const response = await fetch(`${API_URL}/complaints`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const complaints = data.data.complaints || [];
+                
+                let html = '';
+                complaints.forEach(c => {
+                    html += `
+                        <div class="card">
+                            <h3>#${c.id}</h3>
+                            <p><strong>Category:</strong> ${c.category}</p>
+                            <p><strong>Status:</strong> ${c.status}</p>
+                            <p><strong>Priority:</strong> ${c.priority}</p>
+                            <p><strong>Description:</strong> ${c.description}</p>
+                            <p><strong>Location:</strong> ${c.location_address}</p>
+                            <p><small>${new Date(c.created_at).toLocaleString()}</small></p>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('complaintsList').innerHTML = html || '<p>No complaints yet</p>';
+            } catch (e) {
+                console.error('Error loading complaints:', e);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            token = null;
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showMessage(msg, type) {
+            const div = document.getElementById('message');
+            div.textContent = msg;
+            div.className = `message ${type}`;
+            setTimeout(() => div.textContent = '', 5000);
+        }
+    </script>
+</body>
+</html>

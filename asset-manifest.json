@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/City-Help-Desk/static/css/main.216407b7.css",
+    "main.js": "/City-Help-Desk/static/js/main.5be3aafe.js",
+    "index.html": "/City-Help-Desk/index.html",
+    "main.216407b7.css.map": "/City-Help-Desk/static/css/main.216407b7.css.map",
+    "main.5be3aafe.js.map": "/City-Help-Desk/static/js/main.5be3aafe.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.216407b7.css",
+    "static/js/main.5be3aafe.js"
+  ]
+}
