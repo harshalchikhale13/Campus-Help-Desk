@@ -308,9 +308,8 @@ For issues, questions, or suggestions:
 
 ## 👥 Team
 
-- **Developer**: Your Name
-- **Designer**: Design Team
-- **Project Manager**: PM Name
+- **DevOps Engineer**: Harshal Chikhale
+
 
 ---
 
