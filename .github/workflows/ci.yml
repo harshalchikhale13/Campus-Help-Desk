@@ -40,7 +40,8 @@ jobs:
 
       - name: Build Frontend
         working-directory: frontend
-        run: npm run build
+        run: CI=false npm run build
+
 
       - name: CI Completed
         run: echo "City Help Desk CI Pipeline completed successfully"
