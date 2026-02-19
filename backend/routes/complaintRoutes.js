@@ -12,11 +12,11 @@ const { validateComplaint, handleValidationErrors } = require('../utils/validato
  * Public Routes (requiring authentication)
  */
 
-// Create complaint (Citizens and Admins)
+// Create complaint (Citizens, Staff, and Admins)
 router.post(
   '/',
   authenticateToken,
-  authorize('citizen', 'admin', 'department_officer'),
+  authorize('citizen', 'staff', 'admin', 'department_officer'),
   validateComplaint(),
   handleValidationErrors,
   complaintController.createComplaint

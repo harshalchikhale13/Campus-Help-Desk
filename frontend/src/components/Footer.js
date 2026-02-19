@@ -14,8 +14,7 @@ export default function Footer() {
           <div className="footer-section">
             <h3>About</h3>
             <p>
-              Civic Complaint Management System helps citizens report and track
-              municipal issues efficiently.
+              Campus-Help Desk enables students to report and monitor campus-related issues efficiently, improving communication and issue resolution within the college.
             </p>
           </div>
 

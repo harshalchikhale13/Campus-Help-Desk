@@ -42,21 +42,24 @@
 }
 
 .nav-link:hover {
-  color: var(--primary-color);
+  color: #ef4444;
+  /* Red hover */
 }
 
 .nav-link-primary {
-  background-color: #ff6b6b;
+  background: linear-gradient(135deg, #ef4444 0%, #8b5cf6 100%);
   color: white !important;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
   font-weight: 600;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
 }
 
 .nav-link-primary:hover {
-  background-color: #e63946;
-  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+  filter: brightness(1.1);
 }
 
 .nav-user {

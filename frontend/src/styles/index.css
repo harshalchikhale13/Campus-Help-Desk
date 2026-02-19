@@ -8,13 +8,17 @@
 }
 
 :root {
-  /* Premium Palette */
-  --primary-color: #4f46e5;
-  /* Indigo 600 */
-  --primary-dark: #4338ca;
-  --primary-light: #818cf8;
-  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  /* Indigo to Violet */
+  /* Premium Palette - Light Theme */
+  --primary-color: #ef4444;
+  /* Red */
+  --primary-dark: #dc2626;
+  --primary-light: #fca5a5;
+
+  /* Red to Purple Gradient */
+  --primary-gradient: linear-gradient(135deg, #ef4444 0%, #8b5cf6 100%);
+
+  /* Blue to Cyan Gradient (requested "lite blue colour mix") */
+  --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
 
   --secondary-color: #64748b;
   --success-color: #10b981;
@@ -22,20 +26,22 @@
   --danger-color: #ef4444;
   --info-color: #0ea5e9;
 
-  --light-bg: #f8fafc;
-  --dark-bg: #0f172a;
+  --light-bg: #f0f9ff;
+  /* Very Light Blue tint per request */
+  --dark-bg: #1e293b;
   --card-bg: #ffffff;
 
   --border-color: #e2e8f0;
 
-  --text-primary: #1e293b;
-  /* Slate 800 */
-  --text-secondary: #64748b;
-  /* Slate 500 */
+  --text-primary: #1f2937;
+  /* Gray 800 */
+  --text-secondary: #6b7280;
+  /* Gray 500 */
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-purple: 0 10px 25px -5px rgba(139, 92, 246, 0.15);
 }
 
 body {
@@ -44,8 +50,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
   background-color: var(--light-bg);
+  /* Applies the light blue tint globally */
+  background-image: linear-gradient(to bottom right, #f0f9ff, #fdf2f8);
+  /* Subtle blue to pink mix */
+  background-attachment: fixed;
   font-size: 16px;
-  /* Explicit base size */
   line-height: 1.6;
   min-height: 100vh;
 }

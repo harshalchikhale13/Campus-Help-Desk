@@ -10,7 +10,16 @@ const { generateToken } = require('../utils/jwtToken');
  * Register new user
  */
 const registerUser = async (userData) => {
-  const { username, email, password, firstName, lastName, phone, role = 'citizen' } = userData;
+  const { username, email, password, firstName, lastName, phone, role: requestedRole } = userData;
+
+  // Map friendly role names; prevent admin self-registration
+  let role = 'citizen'; // default
+  if (requestedRole === 'staff') {
+    role = 'staff';
+  } else if (requestedRole === 'student') {
+    role = 'citizen';
+  }
+  // 'admin' and 'department_officer' cannot be self-registered
 
   try {
     // Check if user already exists
@@ -44,7 +53,7 @@ const registerUser = async (userData) => {
     });
 
     return {
-      user: {
+      data: {
         id: user.id,
         username: user.username,
         email: user.email,

@@ -24,7 +24,7 @@
   font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.025em;
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -49,21 +49,22 @@
   border-radius: 0.75rem;
   font-size: 1rem;
   color: var(--text-primary);
-  background-color: white;
+  background-color: #f8fafc;
   transition: all 0.2s ease;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  border-color: #8b5cf6;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 
 .complaints-list {
   background-color: white;
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-purple);
   border: 1px solid var(--border-color);
 }
 
@@ -77,17 +78,17 @@
 }
 
 .complaints-table thead {
-  background: var(--light-bg);
+  background: linear-gradient(to right, #f0f9ff, #fdf2f8);
   border-bottom: 2px solid var(--border-color);
 }
 
 .complaints-table th {
   padding: 1.25rem 1.5rem;
   text-align: left;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: #4b5563;
   border-bottom: 2px solid var(--border-color);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -101,7 +102,8 @@
 }
 
 .complaints-table tbody tr:hover {
-  background-color: var(--light-bg);
+  background-color: #fdf2f8;
+  /* Very light pink/purple hover */
 }
 
 .complaint-id {

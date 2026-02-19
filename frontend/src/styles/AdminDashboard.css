@@ -13,7 +13,7 @@
   padding: 2.5rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-purple);
   border: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -28,6 +28,10 @@
   color: var(--text-primary);
   font-weight: 800;
   letter-spacing: -0.025em;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .admin-header p {
@@ -63,14 +67,15 @@
 }
 
 .tab-button:hover {
-  color: var(--primary-color);
-  background: rgba(79, 70, 229, 0.05);
+  color: #ef4444;
+  background: #fef2f2;
 }
 
 .tab-button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-  background: rgba(79, 70, 229, 0.05);
+  color: #8b5cf6;
+  /* Purple active */
+  border-bottom-color: #8b5cf6;
+  background: #f5f3ff;
 }
 
 .tab-content {
@@ -109,7 +114,8 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: var(--primary-gradient);
+  background: var(--secondary-gradient);
+  /* Blue/Cyan gradient for stats */
 }
 
 .stat-card:hover {

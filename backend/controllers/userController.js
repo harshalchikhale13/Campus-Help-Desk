@@ -9,7 +9,7 @@ const { asyncHandler, ApiError } = require('../middleware/errorHandler');
  * Register user
  */
 const register = asyncHandler(async (req, res) => {
-  const { username, email, password, firstName, lastName, phone } = req.body;
+  const { username, email, password, firstName, lastName, phone, role } = req.body;
 
   if (!username || !email || !password || !firstName || !lastName) {
     throw new ApiError(400, 'Missing required fields');
@@ -22,6 +22,7 @@ const register = asyncHandler(async (req, res) => {
     firstName,
     lastName,
     phone,
+    role,
   });
 
   res.status(201).json({
@@ -113,6 +114,20 @@ const getUserById = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * Toggle user active status (Admin only)
+ */
+const toggleUserStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = await userService.toggleUserStatus(id);
+
+  res.json({
+    success: true,
+    message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+    data: user,
+  });
+});
+
 module.exports = {
   register,
   login,
@@ -120,4 +135,5 @@ module.exports = {
   updateProfile,
   getAllUsers,
   getUserById,
+  toggleUserStatus,
 };
