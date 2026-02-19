@@ -78,121 +78,181 @@ export default function RegisterPage() {
     }
   };
 
+  // Static chart data for visual consistency
+  const chartData = [
+    { name: 'Mon', solved: 45, pending: 24 },
+    { name: 'Tue', solved: 52, pending: 18 },
+    { name: 'Wed', solved: 38, pending: 20 },
+    { name: 'Thu', solved: 65, pending: 15 },
+    { name: 'Fri', solved: 48, pending: 12 },
+  ];
+
   return (
-    <div className="auth-container">
-      <div className="auth-card auth-card-large">
-        <div className="auth-header">
-          <h1>🏛️ City-Help Desk</h1>
-          <h2>Register</h2>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                placeholder="First name"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Last name"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Choose a username"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="your.email@example.com"
-              required
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Min 8 chars, uppercase, lowercase, number, special char"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Re-enter password"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="phone">Phone (Optional)</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="10-digit phone number"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login" className="link">
-              Login here
-            </Link>
+    <div className="login-page-container">
+      {/* Left Hero Section */}
+      <div className="login-hero-section">
+        <div className="hero-content">
+          <h1>Join Our <br /> <span className="highlight-text">Campus Community.</span></h1>
+          <p className="hero-subtitle">
+            Sign up to report issues instantly, track resolutions in real-time, and make your voice heard for a better campus environment.
           </p>
+
+          <div className="hero-stats-card">
+            <div className="chart-header">
+              <h3>Impact Overview</h3>
+              <div className="live-indicator">
+                <span className="dot"></span> Live Data
+              </div>
+            </div>
+
+            {/* Recharts Graph Visualization */}
+            <div style={{ width: '100%', height: 160 }}>
+              <div className="mock-graph">
+                {chartData.map((d, i) => (
+                  <div key={i} className="graph-bar-group">
+                    <div className="bar-fill solved" style={{ height: `${d.solved}%` }}></div>
+                    <div className="bar-fill pending" style={{ height: `${d.pending}%` }}></div>
+                    <span className="bar-label">{d.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="stats-row">
+              <div className="stat-item">
+                <span className="stat-value">1200+</span>
+                <span className="stat-label">Active Students</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">98%</span>
+                <span className="stat-label">Resolution Rate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="hero-overlay"></div>
+      </div>
+
+      {/* Right Form Section */}
+      <div className="login-form-section">
+        <div className="login-card" style={{ maxWidth: '100%' }}>
+          <div className="login-header" style={{ marginBottom: '20px' }}>
+            <div className="logo-icon" style={{ fontSize: '3rem' }}>🎓</div>
+            <h2>Create Account</h2>
+            <p>Get started with Campus-Help Desk</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="login-form" style={{ gap: '20px' }}>
+
+            {/* Name Row */}
+            <div className="form-row-modern">
+              <div className="form-group-modern">
+                <label htmlFor="firstName">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="First name"
+                  required
+                />
+              </div>
+              <div className="form-group-modern">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Last name"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Username & Phone Row */}
+            <div className="form-row-modern">
+              <div className="form-group-modern">
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  required
+                />
+              </div>
+              <div className="form-group-modern">
+                <label htmlFor="phone">Phone (Optional)</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Mobile number"
+                />
+              </div>
+            </div>
+
+            <div className="form-group-modern">
+              <label htmlFor="email">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="student@college.edu"
+                required
+              />
+            </div>
+
+            {/* Password Row */}
+            <div className="form-row-modern">
+              <div className="form-group-modern">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <div className="form-group-modern">
+                <label htmlFor="confirmPassword">Confirm</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn-modern-primary" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p>
+              Already have an account?
+              <Link to="/login" className="link-modern">
+                Login here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

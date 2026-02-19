@@ -11,17 +11,32 @@
     "is_active": true,
     "profile_image": null,
     "created_at": "2026-01-18T10:00:00.000Z",
-    "updated_at": "2026-01-31T09:19:43.342Z",
-    "last_login": "2026-01-31T09:19:43.342Z"
+    "updated_at": "2026-02-19T12:19:28.041Z",
+    "last_login": "2026-02-19T12:19:28.041Z"
   },
   {
     "id": 2,
     "username": "officer",
     "email": "officer@example.com",
     "password": "$2a$10$yRIxhS77itP233RdVddCc.2VHDWyzBrJkWa9xISBZtMUzWteu7QIO",
-    "first_name": "Priya",
+    "first_name": "Nakul",
     "last_name": "Singh",
-    "phone": "9876543211",
+    "phone": "123456789",
+    "role": "officer",
+    "is_active": true,
+    "profile_image": null,
+    "created_at": "2026-01-18T10:00:00.000Z",
+    "updated_at": "2026-02-19T12:42:37.432Z",
+    "last_login": "2026-02-19T12:42:37.430Z"
+  },
+  {
+    "id": 2,
+    "username": "officer",
+    "email": "officer@example.com",
+    "password": "$2a$10$yRIxhS77itP233RdVddCc.2VHDWyzBrJkWa9xISBZtMUzWteu7QIO",
+    "first_name": "Nakul",
+    "last_name": "Ingole",
+    "phone": "1234567890",
     "role": "officer",
     "is_active": true,
     "profile_image": null,
@@ -41,8 +56,8 @@
     "is_active": true,
     "profile_image": null,
     "created_at": "2026-01-18T10:00:00.000Z",
-    "updated_at": "2026-01-31T09:21:48.135Z",
-    "last_login": "2026-01-31T09:21:48.134Z"
+    "updated_at": "2026-02-19T12:25:11.981Z",
+    "last_login": "2026-02-19T12:25:11.980Z"
   },
   {
     "id": 4,
@@ -84,8 +99,22 @@
     "role": "citizen",
     "is_active": true,
     "profile_image": null,
-    "last_login": "2026-01-19T18:37:23.082Z",
+    "last_login": "2026-02-19T11:55:32.622Z",
     "created_at": "2026-01-19T05:14:12.649Z",
-    "updated_at": "2026-01-19T18:37:23.083Z"
+    "updated_at": "2026-02-19T11:55:32.623Z"
+  },
+  {
+    "id": 7,
+    "username": "Nakul",
+    "email": "nakul@13.com",
+    "password": "$2a$10$Z.3.mij6m.2WHNdmubJCw.mJRDPTfWF26e2NdZ7MP1SZSbei7Iypy",
+    "first_name": "Nakul",
+    "last_name": "Ingole",
+    "phone": "1234567890",
+    "role": "citizen",
+    "is_active": true,
+    "profile_image": null,
+    "last_login": "2026-02-19T12:44:38.491Z",
+    "created_at": "2026-02-19T12:44:38.491Z"
   }
 ]

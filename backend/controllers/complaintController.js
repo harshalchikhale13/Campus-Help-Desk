@@ -10,14 +10,32 @@ const { asyncHandler, ApiError } = require('../middleware/errorHandler');
  * Create complaint
  */
 const createComplaint = asyncHandler(async (req, res) => {
-  const { category, description, imageUrl, latitude, longitude, locationAddress, priority } = req.body;
+  const {
+    category,
+    description,
+    imageUrl,
+    studentId,
+    department,
+    buildingName,
+    roomNumber,
+    issueLocation,
+    priority
+  } = req.body;
 
-  if (!category || !description || !latitude || !longitude || !locationAddress) {
-    throw new ApiError(400, 'Missing required fields');
-  }
+
 
   const complaint = await complaintService.createComplaint(
-    { category, description, imageUrl, latitude, longitude, locationAddress, priority },
+    {
+      category,
+      description,
+      imageUrl,
+      studentId,
+      department,
+      buildingName,
+      roomNumber,
+      issueLocation,
+      priority
+    },
     req.user.id
   );
 

@@ -1,9 +1,9 @@
 /* Dashboard Styles */
 .dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  max-width: 100%;
+  margin: 0;
+  padding: 3rem;
+  background: transparent;
   min-height: 100vh;
 }
 
@@ -11,43 +11,60 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
 }
 
 .dashboard-header h1 {
   margin: 0;
-  color: #2c3e50;
-  font-size: 28px;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .filters-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
   background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .filter-select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ecf0f1;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
 .complaints-list {
   background-color: white;
-  border-radius: 12px;
+  border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
 }
 
 .table-responsive {
@@ -60,89 +77,96 @@
 }
 
 .complaints-table thead {
-  background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
-  border-bottom: 2px solid #2980b9;
+  background: var(--light-bg);
+  border-bottom: 2px solid var(--border-color);
 }
 
 .complaints-table th {
-  padding: 1rem;
+  padding: 1.25rem 1.5rem;
   text-align: left;
   font-weight: 600;
-  color: white;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .complaints-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #ecf0f1;
-  color: #2c3e50;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1rem;
+  vertical-align: middle;
 }
 
 .complaints-table tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: var(--light-bg);
 }
 
 .complaint-id {
-  font-weight: 600;
-  color: #3498db;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-family: monospace;
+  font-size: 1.1em;
 }
 
 .description {
-  max-width: 300px;
+  max-width: 350px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-secondary);
 }
 
 .btn-view {
-  padding: 0.5rem 1rem;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .btn-view:hover {
-  background: #2980b9;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .pagination-info {
   text-align: center;
   padding: 1.5rem;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   background: white;
-  border-radius: 0 0 12px 12px;
+  border-top: 1px solid var(--border-color);
 }
 
 @media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+
   .dashboard-header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
-  }
-
-  .dashboard-header h1 {
-    margin-bottom: 1rem;
-  }
-
-  .btn-primary {
-    width: 100%;
+    padding: 1.5rem;
   }
 
   .filters-section {
     grid-template-columns: 1fr;
-  }
-
-  .complaints-table {
-    font-size: 0.875rem;
+    padding: 1.5rem;
   }
 
   .complaints-table th,
   .complaints-table td {
-    padding: 0.75rem;
+    padding: 1rem;
   }
 
   .description {

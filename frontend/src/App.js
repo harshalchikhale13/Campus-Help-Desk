@@ -48,7 +48,7 @@ function AppContent() {
   return (
     <div className="app">
       {isAuthenticated && <Navbar />}
-      
+
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
@@ -94,7 +94,7 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AppContent />
       </BrowserRouter>
     </AuthProvider>

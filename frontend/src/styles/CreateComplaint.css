@@ -1,8 +1,9 @@
 /* Create Complaint Styles */
 .create-complaint-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 3rem;
+  width: 100%;
 }
 
 .create-complaint-card {

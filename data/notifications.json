@@ -185,5 +185,71 @@
     "is_read": false,
     "email_sent": false,
     "created_at": "2026-01-31T09:20:37.828Z"
+  },
+  {
+    "id": 18,
+    "user_id": 3,
+    "complaint_id": 6,
+    "type": "submission",
+    "title": "Complaint Submitted",
+    "message": "Your complaint (ID: CMP-MLTFCBTG-70HWO2) has been successfully submitted.",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:15:27.706Z"
+  },
+  {
+    "id": 19,
+    "user_id": 3,
+    "complaint_id": 4,
+    "type": "update",
+    "title": "Complaint Status Updated",
+    "message": "Your complaint (ID: ISS-20260219-004) status has been updated to: resolved",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:18:19.690Z"
+  },
+  {
+    "id": 20,
+    "user_id": 1,
+    "complaint_id": 7,
+    "type": "submission",
+    "title": "Complaint Submitted",
+    "message": "Your complaint (ID: CMP-MLTFI7RA-7SRASE) has been successfully submitted.",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:20:02.383Z"
+  },
+  {
+    "id": 21,
+    "user_id": 3,
+    "complaint_id": 8,
+    "type": "submission",
+    "title": "Complaint Submitted",
+    "message": "Your complaint (ID: CMP-MLTFPIF4-BPIUMJ) has been successfully submitted.",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:25:42.817Z"
+  },
+  {
+    "id": 22,
+    "user_id": 3,
+    "complaint_id": 9,
+    "type": "submission",
+    "title": "Complaint Submitted",
+    "message": "Your complaint (ID: CMP-MLTFZBO0-ABH7XG) has been successfully submitted.",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:33:20.663Z"
+  },
+  {
+    "id": 23,
+    "user_id": 3,
+    "complaint_id": 10,
+    "type": "submission",
+    "title": "Complaint Submitted",
+    "message": "Your complaint (ID: CMP-MLTFZE65-QK1IX6) has been successfully submitted.",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-02-19T12:33:23.902Z"
   }
 ]

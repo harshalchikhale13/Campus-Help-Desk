@@ -1,32 +1,52 @@
 [
   {
     "id": 1,
-    "name": "Roads & Transport",
-    "description": "Handles road-related issues",
-    "email": "roads@civic.gov",
-    "phone": "011-1234-5678",
+    "name": "IT Support",
+    "description": "Handles computer, network, and software issues",
+    "email": "it.support@college.edu",
+    "phone": "555-0101",
     "is_active": true,
-    "created_at": "2026-01-01T00:00:00.000Z",
-    "updated_at": "2026-01-01T00:00:00.000Z"
+    "created_at": "2026-02-19T00:00:00.000Z",
+    "updated_at": "2026-02-19T00:00:00.000Z"
   },
   {
     "id": 2,
-    "name": "Water Supply",
-    "description": "Manages water-related complaints",
-    "email": "water@civic.gov",
-    "phone": "011-1234-5679",
+    "name": "Hostel Administration",
+    "description": "Manages student accommodation issues",
+    "email": "hostel@college.edu",
+    "phone": "555-0102",
     "is_active": true,
-    "created_at": "2026-01-01T00:00:00.000Z",
-    "updated_at": "2026-01-01T00:00:00.000Z"
+    "created_at": "2026-02-19T00:00:00.000Z",
+    "updated_at": "2026-02-19T00:00:00.000Z"
   },
   {
     "id": 3,
-    "name": "Sanitation",
-    "description": "Handles waste and cleanliness",
-    "email": "sanitation@civic.gov",
-    "phone": "011-1234-5680",
+    "name": "Maintenance (Electrical)",
+    "description": "Handles fans, lights, and power issues",
+    "email": "electric@college.edu",
+    "phone": "555-0103",
     "is_active": true,
-    "created_at": "2026-01-01T00:00:00.000Z",
-    "updated_at": "2026-01-01T00:00:00.000Z"
+    "created_at": "2026-02-19T00:00:00.000Z",
+    "updated_at": "2026-02-19T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Maintenance (Civil/Plumbing)",
+    "description": "Handles furniture, water, and building repairs",
+    "email": "civil@college.edu",
+    "phone": "555-0104",
+    "is_active": true,
+    "created_at": "2026-02-19T00:00:00.000Z",
+    "updated_at": "2026-02-19T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "name": "Academic Affairs",
+    "description": "Library and Classroom resource issues",
+    "email": "academic@college.edu",
+    "phone": "555-0105",
+    "is_active": true,
+    "created_at": "2026-02-19T00:00:00.000Z",
+    "updated_at": "2026-02-19T00:00:00.000Z"
   }
 ]

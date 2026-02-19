@@ -3,29 +3,19 @@
  * Shows complaint details, timeline, history, and real-time updates
  */
 
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   StatusBadge,
   PriorityBadge,
-  Timeline,
   Button,
   EmptyState,
   LoadingSpinner,
 } from '../components/UIComponents';
 import { useAuth } from '../context/AuthContext';
 import './ComplaintDetail.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-
-// Fix Leaflet marker icon issue
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
 
 export default function ComplaintDetailPage() {
   const { id } = useParams();
@@ -33,7 +23,6 @@ export default function ComplaintDetailPage() {
   const { token, user } = useAuth();
 
   const [complaint, setComplaint] = useState(null);
-  const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [officers, setOfficers] = useState([]);
@@ -41,7 +30,7 @@ export default function ComplaintDetailPage() {
   const [selectedOfficer, setSelectedOfficer] = useState('');
 
   /**
-   * Fetch complaint details
+   * Fetch issue details
    */
   useEffect(() => {
     const fetchComplaint = async () => {
@@ -59,7 +48,7 @@ export default function ComplaintDetailPage() {
           const data = await response.json();
           setComplaint(data.data.complaint);
         } else {
-          setError('Complaint not found');
+          setError('Issue not found');
         }
       } catch (err) {
         setError(err.message);
@@ -71,13 +60,10 @@ export default function ComplaintDetailPage() {
     fetchComplaint();
   }, [id, token]);
 
-  useEffect(() => {
-    if (user && (user.role === 'admin' || user.role === 'department_officer') && token) {
-      fetchOfficers();
-    }
-  }, [user, token]);
 
-  const fetchOfficers = async () => {
+
+
+  const fetchOfficers = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:5000/api/admin/stats/officers', {
         headers: { Authorization: `Bearer ${token}` }
@@ -87,9 +73,15 @@ export default function ComplaintDetailPage() {
         setOfficers(data);
       }
     } catch (err) {
-      console.error('Failed to fetch officers', err);
+      console.error('Failed to fetch staff', err);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (user && (user.role === 'admin' || user.role === 'department_officer') && token) {
+      fetchOfficers();
+    }
+  }, [user, token, fetchOfficers]);
 
   const handleAssignOfficer = async () => {
     if (!selectedOfficer) return;
@@ -107,13 +99,13 @@ export default function ComplaintDetailPage() {
         const data = await response.json();
         setComplaint(data.complaint);
         setShowAssignUI(false);
-        alert('Officer assigned successfully');
+        alert('Staff assigned successfully');
       } else {
-        alert('Failed to assign officer');
+        alert('Failed to assign staff');
       }
     } catch (err) {
       console.error(err);
-      alert('Error assigning officer');
+      alert('Error assigning staff');
     }
   };
 
@@ -121,15 +113,18 @@ export default function ComplaintDetailPage() {
    * Get category icon
    */
   const getCategoryIcon = (category) => {
-    const icons = {
-      Garbage: '♻️',
-      Road: '🛣️',
-      Water: '💧',
-      Electricity: '⚡',
-      Drainage: '🚰',
-      Public_Safety: '🚨',
+    // Map to emoji for now as per previous design or use FontAwesome if available. 
+    // Using Emojis to match rest of app style
+    const emojiIcons = {
+      hostel_issues: '🛌',
+      classroom_issues: '🏫',
+      laboratory_issues: '🧪',
+      it_support: '💻',
+      library_issues: '📚',
+      campus_infrastructure: '🏗️',
+      campus_safety: '🛡️',
     };
-    return icons[category] || '📌';
+    return emojiIcons[category] || '📌';
   };
 
   /**
@@ -150,8 +145,8 @@ export default function ComplaintDetailPage() {
       <div className="complaint-detail-container">
         <EmptyState
           icon="⚠️"
-          title="Error Loading Complaint"
-          description={error || 'The complaint could not be found'}
+          title="Error Loading Issue"
+          description={error || 'The issue could not be found'}
           action={
             <Button variant="primary" onClick={() => navigate(-1)}>
               ← Back
@@ -167,12 +162,16 @@ export default function ComplaintDetailPage() {
       {/* Header */}
       <div className="detail-header">
         <div>
+          <div className="header-badges">
+            <StatusBadge status={complaint.status} />
+            <PriorityBadge priority={complaint.priority} />
+          </div>
           <h1>
-            {getCategoryIcon(complaint.category)} Complaint #{complaint.id}
+            Issue #{complaint.complaint_id}
           </h1>
-          <p>{complaint.description.substring(0, 100)}...</p>
+          <p className="header-desc">{complaint.description}</p>
         </div>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button variant="secondary" onClick={() => navigate(-1)} className="back-btn">
           ← Back
         </Button>
       </div>
@@ -181,36 +180,20 @@ export default function ComplaintDetailPage() {
       <div className="detail-grid">
         {/* Left Column: Details */}
         <div className="detail-main">
-          {/* Status & Priority */}
-          <Card className="status-section">
-            <div className="status-header">
-              <div>
-                <h3>Current Status</h3>
-                <StatusBadge status={complaint.status} />
-              </div>
-              <div>
-                <h3>Priority</h3>
-                <PriorityBadge priority={complaint.priority} />
-              </div>
-            </div>
-          </Card>
 
-          {/* Complaint Details */}
-          <Card>
-            <h3>📋 Complaint Details</h3>
+          {/* Issue Details - Merged with Location Info */}
+          <Card className="modern-card">
+            <h3>📋 Issue Details</h3>
             <div className="detail-section">
               <div className="detail-row">
-                <span className="label">Category:</span>
+                <span className="label">Category</span>
                 <span className="value">
-                  {getCategoryIcon(complaint.category)} {complaint.category}
+                  {getCategoryIcon(complaint.category)} {complaint.category.replace(/_/g, ' ')}
                 </span>
               </div>
+
               <div className="detail-row">
-                <span className="label">Description:</span>
-                <span className="value long">{complaint.description}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Filed On:</span>
+                <span className="label">Reported Date</span>
                 <span className="value">
                   {new Date(complaint.created_at).toLocaleDateString('en-IN', {
                     weekday: 'short',
@@ -222,103 +205,66 @@ export default function ComplaintDetailPage() {
                   })}
                 </span>
               </div>
-            </div>
-          </Card>
 
-          {/* Location Information */}
-          <Card>
-            <h3>📍 Location Information</h3>
-            <div className="detail-section">
               <div className="detail-row">
-                <span className="label">Address:</span>
-                <span className="value">{complaint.location_address}</span>
+                <span className="label">Student ID</span>
+                <span className="value">{complaint.student_id || 'N/A'}</span>
               </div>
-              <div className="detail-row">
-                <span className="label">Coordinates:</span>
-                <span className="value">
-                  {complaint.latitude}, {complaint.longitude}
-                </span>
-              </div>
-              <div className="map-container">
-                <MapContainer
-                  center={[Number(complaint.latitude), Number(complaint.longitude)]}
-                  zoom={15}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <Marker position={[Number(complaint.latitude), Number(complaint.longitude)]}>
-                    <Popup>
-                      <strong>{complaint.category} Complaint</strong>
-                      <br />
-                      {complaint.location_address}
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
+
+              {complaint.department && (
+                <div className="detail-row">
+                  <span className="label">Department</span>
+                  <span className="value">{complaint.department}</span>
+                </div>
+              )}
             </div>
+
+
           </Card>
         </div>
 
         {/* Right Column: Sidebar */}
         <div className="detail-sidebar">
           {/* Progress */}
-          <Card className="progress-card">
-            <h3>⏳ Resolution Progress</h3>
+          <Card className="progress-card modern-card">
+            <h3>⏳ Monitor Progress</h3>
             <div className="progress-stepper">
-              {['Submitted', 'In Progress', 'Resolved', 'Closed'].map((step, index) => (
-                <div
-                  key={index}
-                  className={`progress-step ${index < getStatusSteps().length ? 'completed' : ''}`}
-                >
-                  <div className="step-dot" />
-                  <div className="step-label">{step}</div>
-                </div>
-              ))}
+              {['Submitted', 'In Progress', 'Resolved', 'Closed'].map((step, index) => {
+                const statusOrder = ['submitted', 'in-progress', 'resolved', 'closed']; // fixed typo in-progress
+                const currentIdx = statusOrder.indexOf(complaint.status);
+                const isCompleted = index <= currentIdx;
+
+                // Handle slight variations in status naming if backend differs
+                // Assuming 'in-progress' vs 'in_progress'
+
+                return (
+                  <div
+                    key={index}
+                    className={`progress-step ${isCompleted ? 'completed' : ''}`}
+                  >
+                    <div className="step-dot" />
+                    <div className="step-label">{step}</div>
+                  </div>
+                )
+              })}
             </div>
           </Card>
 
-          {/* Quick Info */}
-          <Card className="quick-info">
-            <h3>ℹ️ Quick Information</h3>
-            <div className="info-item">
-              <span className="info-label">Status:</span>
-              <span className="info-value">{complaint.status.replace('_', ' ').toUpperCase()}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Priority:</span>
-              <span className="info-value">{complaint.priority.toUpperCase()}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Days Pending:</span>
-              <span className="info-value">
-                {Math.floor(
-                  (new Date() - new Date(complaint.created_at)) / (1000 * 60 * 60 * 24)
-                )}{' '}
-                days
-              </span>
-            </div>
-          </Card>
 
           {/* Estimated Resolution */}
-          <Card className="estimate-card">
+          <Card className="estimate-card modern-card gradient-card">
             <h3>📅 Estimated Resolution</h3>
             <div className="estimate-content">
-              <p className="estimate-time">7-10 business days</p>
-              <p className="estimate-note">Based on current workload and priority level</p>
+              <p className="estimate-time">3-5 business days</p>
+              <p className="estimate-note">Standard turnaround for campus issues</p>
             </div>
           </Card>
 
           {/* Actions */}
-          <Card className="actions-card">
+          <Card className="actions-card modern-card">
             <h3>⚙️ Actions</h3>
             <Button variant="secondary" style={{ width: '100%', marginBottom: '10px' }}>
-              📞 Contact Department
-            </Button>
-            <Button variant="ghost" style={{ width: '100%' }}>
-              ⭐ Rate Service
+              📞 Contact Admin
             </Button>
 
             {user && (user.role === 'admin' || user.role === 'department_officer') && (
@@ -326,7 +272,7 @@ export default function ComplaintDetailPage() {
                 <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#555' }}>👮 Admin Actions</h4>
                 {!showAssignUI ? (
                   <Button variant="primary" style={{ width: '100%', background: '#2c3e50' }} onClick={() => setShowAssignUI(true)}>
-                    Assign Officer
+                    Assign Staff
                   </Button>
                 ) : (
                   <div className="assign-box">
@@ -335,7 +281,7 @@ export default function ComplaintDetailPage() {
                       value={selectedOfficer}
                       onChange={(e) => setSelectedOfficer(e.target.value)}
                     >
-                      <option value="">Select Officer</option>
+                      <option value="">Select Staff</option>
                       {officers.map(off => (
                         <option key={off.id} value={off.id}>{off.name} ({off.department})</option>
                       ))}

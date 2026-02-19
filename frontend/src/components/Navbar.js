@@ -20,14 +20,14 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/dashboard" className="navbar-logo">
-          <span>🏛️</span> City-Help Desk
+          <span>🎓</span> Campus-Help Desk
         </Link>
 
         <div className={`nav-menu ${menuOpen ? 'active' : ''}`}>
           {user?.role === 'citizen' && (
             <>
               <Link to="/dashboard" className="nav-link">
-                My Complaints
+                My Issues
               </Link>
               <Link to="/complaint/create" className="nav-link nav-link-primary">
                 ✏️ Report Issue
@@ -41,7 +41,7 @@ export default function Navbar() {
                 🎛️ Admin Dashboard
               </Link>
               <Link to="/dashboard" className="nav-link">
-                All Complaints
+                All Issues
               </Link>
             </>
           )}

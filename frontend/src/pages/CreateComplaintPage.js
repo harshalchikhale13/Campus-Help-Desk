@@ -9,12 +9,14 @@ import '../styles/CreateComplaint.css';
 
 export default function CreateComplaintPage() {
   const [formData, setFormData] = useState({
-    category: 'pothole',
+    category: 'classroom_issues',
     description: '',
     priority: 'medium',
-    locationAddress: '',
-    latitude: '28.7041',
-    longitude: '77.1025',
+    studentId: '',
+    department: '',
+    buildingName: '',
+    roomNumber: '',
+    issueLocation: 'Classroom',
     imageUrl: '',
   });
 
@@ -46,54 +48,35 @@ export default function CreateComplaintPage() {
     }
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setFormData(prev => ({
-            ...prev,
-            latitude: position.coords.latitude.toFixed(8),
-            longitude: position.coords.longitude.toFixed(8),
-          }));
-          toast.success('Location retrieved successfully');
-        },
-        (error) => {
-          toast.error('Failed to get location: ' + error.message);
-        }
-      );
-    } else {
-      toast.error('Geolocation is not supported by your browser');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       // Validation
-      if (!formData.category || !formData.description || !formData.locationAddress) {
+      if (!formData.category || !formData.description || !formData.issueLocation || !formData.studentId) {
         toast.error('Please fill all required fields');
         setLoading(false);
         return;
       }
 
-      // Convert coordinates to numbers
       const dataToSubmit = {
-        category: formData.category,
+        category: formData.category === 'other' ? formData.customCategory : formData.category,
         description: formData.description,
         priority: formData.priority,
-        locationAddress: formData.locationAddress,
-        latitude: parseFloat(formData.latitude) || 28.7041,
-        longitude: parseFloat(formData.longitude) || 77.1025,
+        studentId: formData.studentId,
+        department: formData.department,
+        buildingName: formData.buildingName,
+        roomNumber: formData.roomNumber,
+        issueLocation: formData.issueLocation,
         imageUrl: formData.imageUrl || null
       };
 
       const response = await complaintAPI.createComplaint(dataToSubmit);
-      toast.success('Complaint submitted successfully!');
+      toast.success('Issue reported successfully!');
       navigate(`/complaint/${response.data.data.complaint_id}`);
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to submit complaint';
+      const message = error.response?.data?.message || 'Failed to submit issue';
       toast.error(message);
       console.error('Error:', error.response?.data);
     } finally {
@@ -104,12 +87,40 @@ export default function CreateComplaintPage() {
   return (
     <div className="create-complaint-container">
       <div className="create-complaint-card">
-        <h1>📋 Report New Issue</h1>
+        <h1>🎓 Report Campus Issue</h1>
 
         <form onSubmit={handleSubmit} className="complaint-form">
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="studentId">Student ID <span className="required">*</span></label>
+              <input
+                type="text"
+                id="studentId"
+                name="studentId"
+                value={formData.studentId}
+                onChange={handleInputChange}
+                placeholder="e.g. STU-2024-001"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="department">Department</label>
+              <input
+                type="text"
+                id="department"
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                placeholder="e.g. Computer Science"
+              />
+            </div>
+          </div>
+
           <div className="form-group">
             <label htmlFor="category">
-              Category <span className="required">*</span>
+              Issue Category <span className="required">*</span>
             </label>
             <select
               id="category"
@@ -118,20 +129,77 @@ export default function CreateComplaintPage() {
               onChange={handleInputChange}
               required
             >
-              <option value="pothole">Pothole</option>
-              <option value="streetlight">Street Light</option>
-              <option value="water_supply">Water Supply</option>
-              <option value="electricity">Electricity</option>
-              <option value="drainage">Drainage</option>
-              <option value="garbage">Garbage</option>
-              <option value="public_safety">Public Safety</option>
+              <option value="hostel_issues">Hostel Issues</option>
+              <option value="classroom_issues">Classroom Issues</option>
+              <option value="laboratory_issues">Laboratory Issues</option>
+              <option value="it_support">IT Support</option>
+              <option value="library_issues">Library Issues</option>
+              <option value="campus_infrastructure">Campus Infrastructure</option>
+              <option value="campus_safety">Campus Safety & Security</option>
               <option value="other">Other</option>
             </select>
+
+            {formData.category === 'other' && (
+              <input
+                type="text"
+                name="customCategory"
+                value={formData.customCategory || ''}
+                onChange={handleInputChange}
+                placeholder="Please specify the category"
+                className="mt-2"
+                style={{ marginTop: '10px' }}
+                required
+              />
+            )}
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="issueLocation">Location Type <span className="required">*</span></label>
+              <select
+                id="issueLocation"
+                name="issueLocation"
+                value={formData.issueLocation}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="Classroom">Classroom</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Laboratory">Laboratory</option>
+                <option value="Library">Library</option>
+                <option value="Common Area">Common Area</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="buildingName">Building Name</label>
+              <input
+                type="text"
+                id="buildingName"
+                name="buildingName"
+                value={formData.buildingName}
+                onChange={handleInputChange}
+                placeholder="e.g. Academic Block A"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="roomNumber">Room Number</label>
+              <input
+                type="text"
+                id="roomNumber"
+                name="roomNumber"
+                value={formData.roomNumber}
+                onChange={handleInputChange}
+                placeholder="e.g. 101"
+              />
+            </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="description">
-              Description <span className="required">*</span>
+              Issue Description <span className="required">*</span>
             </label>
             <textarea
               id="description"
@@ -157,52 +225,6 @@ export default function CreateComplaintPage() {
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="locationAddress">
-              Location Address <span className="required">*</span>
-            </label>
-            <input
-              type="text"
-              id="locationAddress"
-              name="locationAddress"
-              value={formData.locationAddress}
-              onChange={handleInputChange}
-              placeholder="Enter the location address"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>
-              Coordinates <span style={{ color: '#999' }}>(Optional)</span>
-            </label>
-            <div className="coordinates">
-              <input
-                type="number"
-                name="latitude"
-                value={formData.latitude}
-                onChange={handleInputChange}
-                placeholder="Latitude"
-                step="0.00000001"
-              />
-              <input
-                type="number"
-                name="longitude"
-                value={formData.longitude}
-                onChange={handleInputChange}
-                placeholder="Longitude"
-                step="0.00000001"
-              />
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={getCurrentLocation}
-              >
-                📍 Use Current Location
-              </button>
-            </div>
           </div>
 
           <div className="form-group">
@@ -246,7 +268,7 @@ export default function CreateComplaintPage() {
             className="btn btn-primary btn-large"
             disabled={loading}
           >
-            {loading ? 'Submitting...' : 'Submit Complaint'}
+            {loading ? 'Submitting...' : 'Submit Issue'}
           </button>
         </form>
       </div>

@@ -11,7 +11,7 @@ const { body, validationResult, query } = require('express-validator');
  */
 const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  
+
   return input
     .replace(/[<>]/g, '') // Remove angle brackets
     .replace(/javascript:/gi, '') // Remove javascript protocol
@@ -67,22 +67,23 @@ const validateLogin = () => [
  */
 const validateComplaint = () => [
   body('category')
-    .isIn(['pothole', 'streetlight', 'water_supply', 'electricity', 'drainage', 'garbage', 'public_safety', 'other'])
-    .withMessage('Invalid category'),
+    .optional()
+    .trim(),
   body('description')
-    .trim()
-    .isLength({ min: 5, max: 1000 })
-    .withMessage('Description must be 5-1000 characters'),
-  body('latitude')
-    .isFloat({ min: -90, max: 90 })
-    .withMessage('Invalid latitude'),
-  body('longitude')
-    .isFloat({ min: -180, max: 180 })
-    .withMessage('Invalid longitude'),
-  body('locationAddress')
-    .trim()
-    .isLength({ min: 3 })
-    .withMessage('Location address is required (minimum 3 characters)'),
+    .optional()
+    .trim(),
+  body('studentId')
+    .optional()
+    .trim(),
+  body('issueLocation')
+    .optional()
+    .trim(),
+  body('department')
+    .optional()
+    .trim(),
+  body('buildingName')
+    .optional()
+    .trim(),
 ];
 
 /**

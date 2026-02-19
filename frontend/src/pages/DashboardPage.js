@@ -1,6 +1,6 @@
 /**
  * DashboardPage Component
- * Shows citizen's complaints or all complaints for admin/officers
+ * Shows student's issues or all issues for admin/staff
  */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,10 +28,9 @@ export default function DashboardPage() {
     // If admin, redirect to admin dashboard
     if (user?.role === 'admin' || user?.role === 'department_officer') {
       navigate('/admin');
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       return;
     }
-  }, [user]);
+  }, [user, navigate]);
 
   useEffect(() => {
     // Only fetch if not admin
@@ -51,7 +50,7 @@ export default function DashboardPage() {
       setComplaints(response.data.data.complaints);
       setTotal(response.data.data.total);
     } catch (error) {
-      toast.error('Failed to fetch complaints');
+      toast.error('Failed to fetch issues');
       console.error(error);
     } finally {
       setLoading(false);
@@ -71,11 +70,24 @@ export default function DashboardPage() {
     navigate(`/complaint/${id}`);
   };
 
+  const formatCategory = (category) => {
+    if (!category) return '';
+    return category.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const formatLocation = (c) => {
+    const parts = [];
+    if (c.issue_location) parts.push(c.issue_location);
+    if (c.building_name) parts.push(c.building_name);
+    if (c.room_number) parts.push(c.room_number);
+    return parts.join(' - ') || 'N/A';
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>
-          {user?.role === 'citizen' ? 'My Complaints' : 'All Complaints'}
+          {user?.role === 'citizen' ? 'My Reported Issues' : 'All Campus Issues'}
         </h1>
         {user?.role === 'citizen' && (
           <button
@@ -110,12 +122,13 @@ export default function DashboardPage() {
           className="filter-select"
         >
           <option value="">All Categories</option>
-          <option value="Garbage">Garbage</option>
-          <option value="Road">Road</option>
-          <option value="Water">Water</option>
-          <option value="Electricity">Electricity</option>
-          <option value="Drainage">Drainage</option>
-          <option value="Public_Safety">Public Safety</option>
+          <option value="hostel_issues">Hostel Issues</option>
+          <option value="classroom_issues">Classroom Issues</option>
+          <option value="laboratory_issues">Laboratory Issues</option>
+          <option value="it_support">IT Support</option>
+          <option value="library_issues">Library Issues</option>
+          <option value="campus_infrastructure">Campus Infrastructure</option>
+          <option value="campus_safety">Campus Safety</option>
         </select>
 
         <select
@@ -134,22 +147,23 @@ export default function DashboardPage() {
       {/* Complaints List */}
       <div className="complaints-list">
         {loading ? (
-          <div className="loading">Loading complaints...</div>
+          <div className="loading">Loading issues...</div>
         ) : complaints.length === 0 ? (
           <div className="empty-state">
-            <p>No complaints found</p>
+            <p>No issues found</p>
           </div>
         ) : (
           <div className="table-responsive">
             <table className="complaints-table">
               <thead>
                 <tr>
-                  <th>Complaint ID</th>
+                  <th>Issue ID</th>
                   <th>Category</th>
+                  <th>Location</th>
                   <th>Description</th>
                   <th>Priority</th>
                   <th>Status</th>
-                  <th>Submitted Date</th>
+                  <th>Reported On</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -157,9 +171,10 @@ export default function DashboardPage() {
                 {complaints.map((complaint) => (
                   <tr key={complaint.id}>
                     <td className="complaint-id">{complaint.complaint_id}</td>
-                    <td>{complaint.category}</td>
+                    <td>{formatCategory(complaint.category)}</td>
+                    <td>{formatLocation(complaint)}</td>
                     <td className="description">
-                      {complaint.description.substring(0, 50)}...
+                      {complaint.description.substring(0, 40)}...
                     </td>
                     <td>
                       <span
@@ -198,7 +213,7 @@ export default function DashboardPage() {
       {complaints.length > 0 && (
         <div className="pagination-info">
           <p>
-            Showing {complaints.length} of {total} complaints
+            Showing {complaints.length} of {total} issues
           </p>
         </div>
       )}

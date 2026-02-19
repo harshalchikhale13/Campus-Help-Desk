@@ -80,14 +80,14 @@ export default function LoginPage() {
       {/* Left Side - Hero & Stats */}
       <div className="login-hero-section">
         <div className="hero-content">
-          <h1>Building a Better City,<br /> <span className="highlight-text">Together.</span></h1>
+          <h1>Building a Better Campus,<br /> <span className="highlight-text">Together.</span></h1>
           <p className="hero-subtitle">
-            Report issues, track status, and contribute to your community's improvement with our advanced civic management platform.
+            Report issues, track status, and contribute to your college community's improvement with our advanced campus management platform.
           </p>
 
           <div className="hero-stats-card">
             <div className="chart-header">
-              <h3>Weekly Resolution Impact</h3>
+              <h3>Weekly Issue Resolution</h3>
               <div className="live-indicator">
                 <span className="dot"></span> Live Data
               </div>
@@ -95,20 +95,6 @@ export default function LoginPage() {
 
             {/* Recharts Graph */}
             <div style={{ width: '100%', height: 180 }}>
-              {/* Lazy load recharts to avoid errors if not fully installed in this file scope context? 
-                  Actually I need to import them. I'll stick to a simple visual or assume imports are added.
-                  Wait, I need to add the imports first or include them here. 
-                  Let's use a simple HTML/CSS bar visualization to be safe and robust if imports fail, 
-                  OR strictly add imports. I will add imports in a separate step or try to do it all now. 
-                  Since I can't multi-step reliably in one go, I will assume I can update imports later.
-                  Actually, I already saw PieChart imported in Dashboard PAGE. 
-                  I should update imports in this file.
-                  For now I will use standard HTML/CSS pseudo-graph to look "HD" without dependency risk 
-                  OR I will instruct the tool to add imports.
-                  Let's stick to the prompt: user wants "graphs". 
-                  I will use a static clean SVG or CSS graph for login to ensure it loads fast and looks good.
-                  Actually, Recharts is good. I will add imports.
-              */}
               <div className="mock-graph">
                 {chartData.map((d, i) => (
                   <div key={i} className="graph-bar-group">
@@ -122,7 +108,7 @@ export default function LoginPage() {
 
             <div className="stats-row">
               <div className="stat-item">
-                <span className="stat-value">12k+</span>
+                <span className="stat-value">5k+</span>
                 <span className="stat-label">Issues Resolved</span>
               </div>
               <div className="stat-item">
@@ -130,8 +116,8 @@ export default function LoginPage() {
                 <span className="stat-label">Avg. Response</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">98%</span>
-                <span className="stat-label">Citizen Satisfaction</span>
+                <span className="stat-value">95%</span>
+                <span className="stat-label">Student Satisfaction</span>
               </div>
             </div>
           </div>
@@ -143,9 +129,9 @@ export default function LoginPage() {
       <div className="login-form-section">
         <div className="login-card">
           <div className="login-header">
-            <div className="logo-icon">🏛️</div>
-            <h2>Welcome Back</h2>
-            <p>Enter your details to access your account</p>
+            <div className="logo-icon">🎓</div>
+            <h2>Campus-Help Desk</h2>
+            <p>Sanitizing your account access</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
@@ -155,7 +141,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                placeholder="name@college.edu"
                 required
               />
             </div>
@@ -177,16 +163,16 @@ export default function LoginPage() {
           </form>
 
           <div className="login-footer">
-            <p>New to City-Help?</p>
+            <p>New to Campus-Help?</p>
             <Link to="/register" className="link-modern">Create an account</Link>
           </div>
 
           <div className="demo-pills">
             <small>Quick Login:</small>
             <div className="pill-group">
-              <span onClick={() => { setEmail('citizen@example.com'); setPassword('Password123!') }}>Citizen</span>
-              <span onClick={() => { setEmail('admin@example.com'); setPassword('Password123!') }}>Admin</span>
-              <span onClick={() => { setEmail('officer@example.com'); setPassword('Password123!') }}>Officer</span>
+              <span onClick={() => { setEmail('citizen@example.com'); setPassword('Password123!') }}>Student</span>
+              <span onClick={() => { setEmail('admin@example.com'); setPassword('Password123!') }}>College Admin</span>
+              <span onClick={() => { setEmail('officer@example.com'); setPassword('Password123!') }}>Staff</span>
             </div>
           </div>
         </div>

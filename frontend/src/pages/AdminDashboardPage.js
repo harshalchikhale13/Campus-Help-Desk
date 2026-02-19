@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/AdminDashboard.css';
@@ -19,13 +19,19 @@ const AdminDashboardPage = () => {
   const [error, setError] = useState(null);
   const [showAddComplaint, setShowAddComplaint] = useState(false);
   const [newComplaint, setNewComplaint] = useState({
-    category: 'pothole',
+    category: 'classroom_issues',
     description: '',
     priority: 'medium',
-    latitude: 28.6139,
-    longitude: 77.2090,
-    locationAddress: '',
+    studentId: '',
+    department: '',
+    buildingName: '',
+    roomNumber: '',
+    issueLocation: 'Classroom',
+    imageUrl: '',
   });
+  const [previewImage, setPreviewImage] = useState(null);
+  const fileInputRef = useRef();
+
   const [filters, setFilters] = useState({
     status: '',
     priority: '',
@@ -49,78 +55,68 @@ const AdminDashboardPage = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      console.log('Fetching dashboard data for admin...');
       const [statsRes, officerRes, complaintsRes] = await Promise.all([
-        api.get('/admin/stats/system'),
-        api.get('/admin/stats/officers'),
+        api.get('/complaints/stats/overview'),
+        api.get('/users?role=officer'),
         api.get('/complaints')
       ]);
 
-      console.log('Dashboard data loaded:', { statsRes, officerRes, complaintsRes });
-      setSystemStats(statsRes.data);
-      setOfficerStats(officerRes.data || []);
+      setSystemStats(statsRes.data.data || {});
+      setOfficerStats(officerRes.data.data.users || []);
       setComplaints(complaintsRes.data.data.complaints || []);
       setError(null);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      console.error('Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
+      setSystemStats({
+        total: 0, resolved: 0, inProgress: 0, submitted: 0,
+        byPriority: { low: 0, medium: 0, high: 0 },
+        byCategory: {}
       });
-      setError(err.response?.data?.message || err.message || 'Failed to load dashboard data');
+      setError('Failed to load some dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+        setNewComplaint(prev => ({ ...prev, imageUrl: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddComplaint = async (e) => {
     e.preventDefault();
-
     try {
-      if (!newComplaint.description || !newComplaint.locationAddress) {
-        alert('Please fill in all required fields');
-        return;
-      }
-
-      const response = await api.post('/complaints', {
-        category: newComplaint.category,
-        description: newComplaint.description,
-        priority: newComplaint.priority,
-        latitude: parseFloat(newComplaint.latitude),
-        longitude: parseFloat(newComplaint.longitude),
-        locationAddress: newComplaint.locationAddress,
-      });
-
+      const response = await api.post('/complaints', newComplaint);
       if (response.data.success) {
-        alert('Complaint added successfully!');
+        alert('Issue reported successfully!');
         setShowAddComplaint(false);
         setNewComplaint({
-          category: 'pothole',
+          category: 'classroom_issues',
           description: '',
           priority: 'medium',
-          latitude: 28.6139,
-          longitude: 77.2090,
-          locationAddress: '',
+          studentId: '',
+          department: '',
+          buildingName: '',
+          roomNumber: '',
+          issueLocation: 'Classroom',
+          imageUrl: '',
         });
-        fetchDashboardData();
+        setPreviewImage(null);
+        // Navigate to the detail page of the new complaint
+        // Ensure we handle potential different response structures if needed, but assuming standard here
+        const newComplaintId = response.data.data.complaint_id || response.data.data.id;
+        navigate(`/complaint/${newComplaintId}`);
       }
     } catch (err) {
-      console.error('Error adding complaint:', err);
-
-      // Handle validation errors
-      let errorMessage = 'Failed to add complaint';
-      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
-        errorMessage = 'Validation errors:\n' + err.response.data.errors
-          .map(e => `${e.field}: ${e.message}`)
-          .join('\n');
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      alert(errorMessage);
+      console.error('Error adding issue:', err);
+      alert(err.response?.data?.message || err.message);
     }
   };
 
@@ -130,48 +126,43 @@ const AdminDashboardPage = () => {
         status: newStatus,
         resolutionDescription: newStatus === 'resolved' ? 'Marked as resolved by admin' : '',
       });
-
       if (response.data.success) {
         alert('Status updated successfully!');
         fetchDashboardData();
       }
     } catch (err) {
       console.error('Error updating status:', err);
-      alert('Failed to update status: ' + (err.response?.data?.message || err.message));
+      alert('Failed to update status');
     }
   };
 
   const handleAddOfficer = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/admin/officers', newOfficer);
+      const response = await api.post('/users/register', { ...newOfficer, role: 'officer' });
       if (response.data.success) {
-        alert('Officer created successfully!'); // In a real app use toast
+        alert('Staff created successfully!');
         setShowAddOfficer(false);
         setNewOfficer({ firstName: '', lastName: '', email: '', password: '', department: '', phone: '' });
         fetchDashboardData();
       }
     } catch (err) {
-      console.error('Error creating officer:', err);
-      alert('Failed to create officer: ' + (err.response?.data?.error || err.message));
+      console.error('Error creating staff:', err);
+      alert('Failed to create staff');
     }
   };
 
   const handleDeleteComplaint = async (complaintId) => {
-    if (!window.confirm('Are you sure you want to delete this complaint? This action cannot be undone.')) {
-      return;
-    }
-
+    if (!window.confirm('Are you sure you want to delete this issue?')) return;
     try {
       const response = await api.delete(`/complaints/${complaintId}`);
-
       if (response.data.success) {
-        alert('Complaint deleted successfully!');
+        alert('Issue deleted successfully!');
         fetchDashboardData();
       }
     } catch (err) {
-      console.error('Error deleting complaint:', err);
-      alert('Failed to delete complaint: ' + (err.response?.data?.message || err.message));
+      console.error('Error deleting issue:', err);
+      alert('Failed to delete issue');
     }
   };
 
@@ -179,133 +170,183 @@ const AdminDashboardPage = () => {
     navigate(`/complaint/${complaintId}`);
   };
 
-  if (!user || (user.role !== 'admin' && user.role !== 'department_officer')) {
+  if (loading) {
     return (
       <div className="admin-dashboard-page">
-        <div style={{ padding: '20px', color: '#d32f2f', textAlign: 'center' }}>
-          <h2>Access Denied</h2>
-          <p>Admin access only. Please login as an admin account.</p>
-          <p style={{ fontSize: '0.9rem', marginTop: '10px' }}>Current role: {user?.role || 'Not logged in'}</p>
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <h2>Loading College Portal...</h2>
         </div>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="admin-dashboard-page">
-        <div style={{ padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '20px' }}>⏳</div>
-          <h2>Loading Admin Dashboard...</h2>
-          <p style={{ color: '#666', marginTop: '10px' }}>Please wait while we fetch your data</p>
-        </div>
-      </div>
-    );
-  }
+  const statusData = systemStats ? [
+    { name: 'Submitted', value: systemStats.submitted || 0, fill: '#FF6B6B' },
+    { name: 'In Progress', value: systemStats.inProgress || 0, fill: '#FFA500' },
+    { name: 'Resolved', value: systemStats.resolved || 0, fill: '#4ECDC4' },
+    { name: 'Closed', value: systemStats.closed || 0, fill: '#95E1D3' }
+  ] : [];
+
+  const priorityData = systemStats ? Object.entries(systemStats.byPriority || {}).map(([key, value]) => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value,
+    fill: key === 'high' ? '#e74c3c' : key === 'medium' ? '#f39c12' : '#3498db'
+  })) : [];
+
+  const categoryData = systemStats ? Object.entries(systemStats.byCategory || {}).map(([key, value]) => ({
+    name: key.replace(/_/g, ' '),
+    value
+  })) : [];
 
   return (
     <div className="admin-dashboard-page">
       <div className="admin-header">
         <div>
-          <h1>Admin Control Center</h1>
-          <p>System Management & Analytics</p>
+          <h1>College Issue Management Portal</h1>
+          <p>Campus Administration & Analytics</p>
         </div>
         <button
           className="btn-add-complaint"
           onClick={() => setShowAddComplaint(!showAddComplaint)}
         >
-          ➕ {showAddComplaint ? 'Cancel' : 'Add Complaint'}
+          ➕ {showAddComplaint ? 'Cancel' : 'Report Issue'}
         </button>
       </div>
 
       {error && (
-        <div style={{ padding: '15px', background: '#ffebee', color: '#d32f2f', borderRadius: '4px', marginBottom: '20px' }}>
+        <div className="error-message">
           {error}
         </div>
       )}
 
       {showAddComplaint && (
         <div className="add-complaint-form">
-          <h3>Add New Complaint</h3>
+          <h3>Report Campus Issue</h3>
           <form onSubmit={handleAddComplaint}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Student ID</label>
+                <input type="text" value={newComplaint.studentId} onChange={(e) => setNewComplaint({ ...newComplaint, studentId: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>Department</label>
+                <input type="text" value={newComplaint.department} onChange={(e) => setNewComplaint({ ...newComplaint, department: e.target.value })} />
+              </div>
+            </div>
+
             <div className="form-group">
-              <label>Category *</label>
+              <label>Category</label>
               <select
                 value={newComplaint.category}
                 onChange={(e) => setNewComplaint({ ...newComplaint, category: e.target.value })}
-                required
               >
-                <option value="pothole">Pothole</option>
-                <option value="streetlight">Street Light</option>
-                <option value="water_supply">Water Supply</option>
-                <option value="garbage">Garbage</option>
-                <option value="electricity">Electricity</option>
-                <option value="drainage">Drainage</option>
-                <option value="public_safety">Public Safety</option>
+                <option value="hostel_issues">Hostel Issues</option>
+                <option value="classroom_issues">Classroom Issues</option>
+                <option value="laboratory_issues">Laboratory Issues</option>
+                <option value="it_support">IT Support</option>
+                <option value="library_issues">Library Issues</option>
+                <option value="campus_infrastructure">Campus Infrastructure</option>
+                <option value="campus_safety">Campus Safety</option>
+                <option value="other">Other</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label>Description * <span style={{ fontSize: '0.85rem', color: '#666' }}>(minimum 5 characters)</span></label>
+              <label>Location Type</label>
+              <select
+                value={newComplaint.issueLocation}
+                onChange={(e) => setNewComplaint({ ...newComplaint, issueLocation: e.target.value })}
+              >
+                <option value="Classroom">Classroom</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Laboratory">Laboratory</option>
+                <option value="Library">Library</option>
+                <option value="Common Area">Common Area</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Building Name</label>
+                <input
+                  type="text"
+                  value={newComplaint.buildingName}
+                  onChange={(e) => setNewComplaint({ ...newComplaint, buildingName: e.target.value })}
+                  placeholder="e.g. Block A"
+                />
+              </div>
+              <div className="form-group">
+                <label>Room Number</label>
+                <input
+                  type="text"
+                  value={newComplaint.roomNumber}
+                  onChange={(e) => setNewComplaint({ ...newComplaint, roomNumber: e.target.value })}
+                  placeholder="e.g. 101"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Description</label>
               <textarea
                 value={newComplaint.description}
                 onChange={(e) => setNewComplaint({ ...newComplaint, description: e.target.value })}
                 placeholder="Describe the issue..."
                 rows="3"
-                required
               />
-              <small style={{ color: '#666' }}>Characters: {newComplaint.description.length}/1000</small>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Priority</label>
-                <select
-                  value={newComplaint.priority}
-                  onChange={(e) => setNewComplaint({ ...newComplaint, priority: e.target.value })}
+            <div className="form-group">
+              <label>Priority</label>
+              <select
+                value={newComplaint.priority}
+                onChange={(e) => setNewComplaint({ ...newComplaint, priority: e.target.value })}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Upload Image</label>
+              <div className="file-upload-admin">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  hidden
+                />
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => fileInputRef.current.click()}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Location Address * <span style={{ fontSize: '0.85rem', color: '#666' }}>(minimum 3 characters)</span></label>
-                <input
-                  type="text"
-                  value={newComplaint.locationAddress}
-                  onChange={(e) => setNewComplaint({ ...newComplaint, locationAddress: e.target.value })}
-                  placeholder="Street, Area, City"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Latitude</label>
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={newComplaint.latitude}
-                  onChange={(e) => setNewComplaint({ ...newComplaint, latitude: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Longitude</label>
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={newComplaint.longitude}
-                  onChange={(e) => setNewComplaint({ ...newComplaint, longitude: e.target.value })}
-                />
+                  📸 Choose Image
+                </button>
+                {previewImage && (
+                  <div className="image-preview-mini">
+                    <img src={previewImage} alt="Preview" style={{ height: '50px', marginLeft: '10px', verticalAlign: 'middle' }} />
+                    <button
+                      type="button"
+                      className="btn-remove-sm"
+                      onClick={() => {
+                        setPreviewImage(null);
+                        setNewComplaint(prev => ({ ...prev, imageUrl: '' }));
+                      }}
+                      style={{ marginLeft: '5px', cursor: 'pointer' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn-submit">Submit Complaint</button>
+              <button type="submit" className="btn-submit">Submit Issue</button>
               <button type="button" className="btn-cancel" onClick={() => setShowAddComplaint(false)}>Cancel</button>
             </div>
           </form>
@@ -323,13 +364,13 @@ const AdminDashboardPage = () => {
           className={`tab-button ${activeTab === 'complaints' ? 'active' : ''}`}
           onClick={() => setActiveTab('complaints')}
         >
-          All Complaints
+          All Issues
         </button>
         <button
           className={`tab-button ${activeTab === 'officers' ? 'active' : ''}`}
           onClick={() => setActiveTab('officers')}
         >
-          Officers
+          Staff / Faculty
         </button>
       </div>
 
@@ -337,35 +378,30 @@ const AdminDashboardPage = () => {
         <div className="tab-content">
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-value">{systemStats.totalComplaints}</div>
-              <div className="stat-label">Total Complaints</div>
+              <div className="stat-value">{systemStats.total}</div>
+              <div className="stat-label">Total Issues</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{systemStats.complaintsByStatus.resolved}</div>
+              <div className="stat-value">{systemStats.resolved}</div>
               <div className="stat-label">✅ Resolved</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{systemStats.complaintsByStatus['in-progress']}</div>
+              <div className="stat-value">{systemStats.inProgress}</div>
               <div className="stat-label">⏳ In Progress</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{systemStats.pendingCount}</div>
+              <div className="stat-value">{systemStats.submitted}</div>
               <div className="stat-label">📋 Pending</div>
             </div>
           </div>
 
           <div className="charts-container">
             <div className="chart-wrapper">
-              <h3>Complaint Status Distribution</h3>
+              <h3>Issue Status Distribution</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={[
-                      { name: 'Submitted', value: systemStats.complaintsByStatus.submitted, fill: '#FF6B6B' },
-                      { name: 'In Progress', value: systemStats.complaintsByStatus['in-progress'], fill: '#FFA500' },
-                      { name: 'Resolved', value: systemStats.complaintsByStatus.resolved, fill: '#4ECDC4' },
-                      { name: 'Closed', value: systemStats.complaintsByStatus.closed, fill: '#95E1D3' }
-                    ]}
+                    data={statusData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -374,7 +410,7 @@ const AdminDashboardPage = () => {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {[].map((entry, index) => (
+                    {statusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
@@ -387,17 +423,13 @@ const AdminDashboardPage = () => {
             <div className="chart-wrapper">
               <h3>Priority Distribution</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[
-                  { name: 'Low', value: systemStats.complaintsByPriority.low, fill: '#3498db' },
-                  { name: 'Medium', value: systemStats.complaintsByPriority.medium, fill: '#f39c12' },
-                  { name: 'High', value: systemStats.complaintsByPriority.high, fill: '#e74c3c' }
-                ]}>
+                <BarChart data={priorityData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="value" fill="#8884d8" radius={[8, 8, 0, 0]}>
-                    {[].map((entry, index) => (
+                    {priorityData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Bar>
@@ -406,58 +438,19 @@ const AdminDashboardPage = () => {
             </div>
 
             <div className="chart-wrapper">
-              <h3>Complaint Categories</h3>
+              <h3>Issue Categories</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
-                  data={Object.entries(systemStats.complaintsByCategory).map(([name, value]) => ({
-                    name: name.replace(/_/g, ' '),
-                    value
-                  }))}
+                  data={categoryData}
                   layout="vertical"
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} />
+                  <YAxis dataKey="name" type="category" width={150} />
                   <Tooltip />
                   <Bar dataKey="value" fill="#667eea" radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-
-            <div className="chart-wrapper metrics">
-              <h3>Key Metrics</h3>
-              <div className="metrics-grid">
-                <div className="metric-item">
-                  <div className="metric-label">Assignment Rate</div>
-                  <div className="metric-value">{systemStats.assignmentRate}%</div>
-                  <div className="metric-bar">
-                    <div className="metric-progress" style={{ width: systemStats.assignmentRate + '%' }}></div>
-                  </div>
-                </div>
-                <div className="metric-item">
-                  <div className="metric-label">Average Resolution Time</div>
-                  <div className="metric-value">{systemStats.averageResolutionTime} days</div>
-                </div>
-                <div className="metric-item">
-                  <div className="metric-label">Resolution Rate</div>
-                  <div className="metric-value">
-                    {systemStats.totalComplaints > 0
-                      ? Math.round((systemStats.complaintsByStatus.resolved / systemStats.totalComplaints) * 100)
-                      : 0}%
-                  </div>
-                  <div className="metric-bar">
-                    <div className="metric-progress" style={{
-                      width: (systemStats.totalComplaints > 0
-                        ? Math.round((systemStats.complaintsByStatus.resolved / systemStats.totalComplaints) * 100)
-                        : 0) + '%'
-                    }}></div>
-                  </div>
-                </div>
-                <div className="metric-item">
-                  <div className="metric-label">Overdue Complaints</div>
-                  <div className="metric-value">{systemStats.overdueCount}</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -466,7 +459,7 @@ const AdminDashboardPage = () => {
       {activeTab === 'complaints' && (
         <div className="tab-content">
           <div className="complaints-section">
-            <h2>All Complaints</h2>
+            <h2>All Campus Issues</h2>
             <div className="complaints-filters">
               <select
                 value={filters.status}
@@ -479,16 +472,6 @@ const AdminDashboardPage = () => {
                 <option value="resolved">Resolved</option>
                 <option value="closed">Closed</option>
               </select>
-              <select
-                value={filters.priority}
-                onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-                className="filter-select"
-              >
-                <option value="">All Priority</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
             </div>
 
             {complaints.length > 0 ? (
@@ -496,23 +479,24 @@ const AdminDashboardPage = () => {
                 <table className="complaints-table">
                   <thead>
                     <tr>
-                      <th>Complaint ID</th>
+                      <th>Issue ID</th>
                       <th>Category</th>
+                      <th>Location</th>
                       <th>Description</th>
                       <th>Priority</th>
                       <th>Status</th>
-                      <th>Submitted Date</th>
+                      <th>Reported</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {complaints
                       .filter(c => !filters.status || c.status === filters.status)
-                      .filter(c => !filters.priority || c.priority === filters.priority)
                       .map(complaint => (
                         <tr key={complaint.id}>
                           <td><strong>{complaint.complaint_id}</strong></td>
-                          <td>{complaint.category}</td>
+                          <td>{complaint.category.replace(/_/g, ' ')}</td>
+                          <td>{complaint.building_name || complaint.issueLocation || 'N/A'}</td>
                           <td>{complaint.description.substring(0, 50)}...</td>
                           <td>
                             <span className={`priority-badge priority-${complaint.priority}`}>
@@ -542,9 +526,8 @@ const AdminDashboardPage = () => {
                             <button
                               className="action-btn delete-btn"
                               onClick={() => handleDeleteComplaint(complaint.id)}
-                              title="Delete complaint"
                             >
-                              🗑️ Delete
+                              🗑️
                             </button>
                           </td>
                         </tr>
@@ -553,9 +536,7 @@ const AdminDashboardPage = () => {
                 </table>
               </div>
             ) : (
-              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-                No complaints found
-              </div>
+              <div className="empty-state">No issues found</div>
             )}
           </div>
         </div>
@@ -563,59 +544,53 @@ const AdminDashboardPage = () => {
 
       {activeTab === 'officers' && (
         <div className="tab-content">
-          <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>Officer Management</h2>
+          <div className="section-header">
+            <h2>Staff / Faculty Management</h2>
             <button
               className="btn-add-complaint"
               onClick={() => setShowAddOfficer(!showAddOfficer)}
             >
-              ➕ {showAddOfficer ? 'Cancel' : 'Add New Officer'}
+              ➕ {showAddOfficer ? 'Cancel' : 'Register New Staff'}
             </button>
           </div>
-
           {showAddOfficer && (
-            <div className="add-complaint-form" style={{ marginBottom: '30px' }}>
-              <h3>Register New Officer</h3>
+            <div className="add-complaint-form">
+              <h3>Register New Staff Member</h3>
               <form onSubmit={handleAddOfficer}>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>First Name *</label>
+                    <label>First Name</label>
                     <input type="text" value={newOfficer.firstName} onChange={e => setNewOfficer({ ...newOfficer, firstName: e.target.value })} required />
                   </div>
                   <div className="form-group">
-                    <label>Last Name *</label>
+                    <label>Last Name</label>
                     <input type="text" value={newOfficer.lastName} onChange={e => setNewOfficer({ ...newOfficer, lastName: e.target.value })} required />
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Email *</label>
+                    <label>Email</label>
                     <input type="email" value={newOfficer.email} onChange={e => setNewOfficer({ ...newOfficer, email: e.target.value })} required />
                   </div>
                   <div className="form-group">
-                    <label>Password *</label>
+                    <label>Password</label>
                     <input type="password" value={newOfficer.password} onChange={e => setNewOfficer({ ...newOfficer, password: e.target.value })} required />
                   </div>
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Department</label>
-                    <select value={newOfficer.department} onChange={e => setNewOfficer({ ...newOfficer, department: e.target.value })}>
-                      <option value="">Select Department</option>
-                      <option value="Roads">Roads</option>
-                      <option value="Water">Water</option>
-                      <option value="Sanitation">Sanitation</option>
-                      <option value="Electricity">Electricity</option>
-                      <option value="Police">Police</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Phone</label>
-                    <input type="text" value={newOfficer.phone} onChange={e => setNewOfficer({ ...newOfficer, phone: e.target.value })} />
-                  </div>
+                <div className="form-group">
+                  <label>Department</label>
+                  <select value={newOfficer.department} onChange={e => setNewOfficer({ ...newOfficer, department: e.target.value })}>
+                    <option value="">Select Department</option>
+                    <option value="IT Support">IT Support</option>
+                    <option value="Hostel Administration">Hostel Administration</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Academic Affairs">Academic Affairs</option>
+                    <option value="Library">Library</option>
+                    <option value="Security">Security</option>
+                  </select>
                 </div>
                 <div className="form-actions">
-                  <button type="submit" className="btn-submit">Register Officer</button>
+                  <button type="submit" className="btn-submit">Register Staff</button>
                 </div>
               </form>
             </div>
@@ -626,40 +601,26 @@ const AdminDashboardPage = () => {
               <table className="officers-table">
                 <thead>
                   <tr>
-                    <th>Officer Name</th>
-                    <th>Department</th>
-                    <th>Assigned</th>
-                    <th>Resolved</th>
-                    <th>Pending</th>
-                    <th>Resolution Rate</th>
+                    <th>Staff Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {officerStats.map(officer => (
                     <tr key={officer.id}>
-                      <td>
-                        <strong>{officer.name}</strong>
-                        <div style={{ fontSize: '0.8em', color: '#666' }}>{officer.email}</div>
-                      </td>
-                      <td><span className="badge badge-info">{officer.department}</span></td>
-                      <td>{officer.totalAssigned}</td>
-                      <td>{officer.resolved}</td>
-                      <td>{officer.pending}</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <div style={{ width: '50px', height: '6px', background: '#eee', borderRadius: '3px' }}>
-                            <div style={{ width: `${officer.resolutionRate}%`, height: '100%', background: '#4caf50', borderRadius: '3px' }}></div>
-                          </div>
-                          {officer.resolutionRate}%
-                        </div>
-                      </td>
+                      <td><strong>{officer.firstName} {officer.lastName}</strong></td>
+                      <td>{officer.email}</td>
+                      <td>{officer.role}</td>
+                      <td>{officer.isActive ? 'Active' : 'Inactive'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="empty-state">No officers found. Add a new officer to get started.</div>
+            <div className="empty-state">No staff found.</div>
           )}
         </div>
       )}

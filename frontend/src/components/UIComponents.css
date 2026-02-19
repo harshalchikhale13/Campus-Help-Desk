@@ -97,28 +97,28 @@
 }
 
 .badge-success {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success);
+  color: var(--white);
 }
 
 .badge-error {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--danger);
+  color: var(--white);
 }
 
 .badge-warning {
-  background: #fff3cd;
-  color: #856404;
+  background: var(--warning);
+  color: var(--white);
 }
 
 .badge-info {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: var(--info);
+  color: var(--white);
 }
 
 .badge-primary {
-  background: #cce5ff;
-  color: #004085;
+  background: var(--primary);
+  color: var(--white);
 }
 
 /* Timeline Component */
@@ -594,6 +594,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -604,6 +605,7 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

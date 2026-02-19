@@ -36,7 +36,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {currentYear} Civic Complaint Management System. All rights reserved.</p>
+          <p>&copy; {currentYear} College Complaint Management System. All rights reserved.</p>
         </div>
       </div>
     </footer>

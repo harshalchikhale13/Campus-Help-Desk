@@ -10,12 +10,14 @@ const { generateComplaintId } = require('../utils/idGenerator');
  */
 const createComplaint = async (complaintData, userId) => {
   const {
-    category,
-    description,
-    imageUrl,
-    latitude,
-    longitude,
-    locationAddress,
+    category = 'other',
+    description = '',
+    imageUrl = '',
+    studentId = '',
+    department = '',
+    buildingName = '',
+    roomNumber = '',
+    issueLocation = '',
     priority = 'medium',
   } = complaintData;
 
@@ -24,12 +26,14 @@ const createComplaint = async (complaintData, userId) => {
   const complaint = db.insert('complaints.json', {
     complaint_id: complaintId,
     user_id: userId,
+    student_id: studentId,
+    department,
     category,
     description,
     image_url: imageUrl,
-    latitude,
-    longitude,
-    location_address: locationAddress,
+    building_name: buildingName,
+    room_number: roomNumber,
+    issue_location: issueLocation,
     status: 'submitted',
     priority,
     assigned_department_id: null,
@@ -48,13 +52,13 @@ const createComplaint = async (complaintData, userId) => {
  */
 const getComplaintById = async (complaintId) => {
   let complaint = null;
-  
+
   // Try numeric ID first
   const numericId = parseInt(complaintId);
   if (!isNaN(numericId)) {
     complaint = db.findById('complaints.json', numericId);
   }
-  
+
   // Try string ID (complaint_id format like "CMP-20260118-001")
   if (!complaint) {
     complaint = db.findOne('complaints.json', { complaint_id: complaintId });
@@ -65,7 +69,7 @@ const getComplaintById = async (complaintId) => {
   }
 
   const user = db.findById('users.json', complaint.user_id);
-  const department = complaint.assigned_department_id 
+  const department = complaint.assigned_department_id
     ? db.findById('departments.json', complaint.assigned_department_id)
     : null;
 
@@ -123,7 +127,7 @@ const getAllComplaints = async (filters = {}, limit = 20, offset = 0) => {
  */
 const updateComplaintStatus = async (complaintId, newStatus, resolutionDescription = null) => {
   let complaint = db.findById('complaints.json', parseInt(complaintId));
-  
+
   if (!complaint) {
     complaint = db.findOne('complaints.json', { complaint_id: complaintId });
   }
@@ -152,7 +156,7 @@ const updateComplaintStatus = async (complaintId, newStatus, resolutionDescripti
  */
 const addComplaintUpdate = async (complaintId, updatedBy, statusChange, comment) => {
   let complaint = db.findById('complaints.json', parseInt(complaintId));
-  
+
   if (!complaint) {
     complaint = db.findOne('complaints.json', { complaint_id: complaintId });
   }
@@ -176,7 +180,7 @@ const addComplaintUpdate = async (complaintId, updatedBy, statusChange, comment)
  */
 const getComplaintHistory = async (complaintId) => {
   let complaint = db.findById('complaints.json', parseInt(complaintId));
-  
+
   if (!complaint) {
     complaint = db.findOne('complaints.json', { complaint_id: complaintId });
   }
@@ -186,7 +190,7 @@ const getComplaintHistory = async (complaintId) => {
   }
 
   const updates = db.find('complaint_updates.json', { complaint_id: complaint.id });
-  
+
   const enrichedUpdates = updates.map((update) => {
     const user = db.findById('users.json', update.updated_by);
     return {
@@ -234,7 +238,7 @@ const getComplaintStats = async () => {
  */
 const deleteComplaint = async (complaintId) => {
   const complaint = db.findById('complaints.json', parseInt(complaintId));
-  
+
   if (!complaint) {
     return null;
   }
