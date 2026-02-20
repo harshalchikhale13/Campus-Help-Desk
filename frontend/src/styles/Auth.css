@@ -33,9 +33,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* Light Purple/Red Tint Overlay */
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(139, 92, 246, 0.85) 100%);
-  z-index: 0;
+  /* Deep Dark Gradient mixing Purple and Red */
+  background: linear-gradient(135deg, rgba(57, 41, 233, 0.9) 0%, rgba(219, 85, 175, 0.85) 100%);
+  z-index: 1;
 }
 
 .hero-content {
@@ -47,27 +47,26 @@
 
 .hero-content h1 {
   font-size: 2.8rem;
-  /* Reduced from 3.5rem */
   font-weight: 800;
   line-height: 1.05;
   margin-bottom: 16px;
   letter-spacing: -0.03em;
-  color: white;
+  color: #ffffff;
+  /* White text for dark BG */
 }
 
 .highlight-text {
-  /* White text for contrast against the vibrant overlay */
-  color: white;
-  text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #f87171;
+  /* Vibrant Red highlight */
+  text-shadow: 0 0 20px rgba(248, 178, 178, 0.4);
 }
 
 .hero-subtitle {
   font-size: 1.1rem;
-  /* Slightly smaller */
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 32px;
-  line-height: 1.4;
-  font-weight: 400;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 /* Stats Card / Graph */
@@ -196,22 +195,87 @@
 .login-form-section {
   flex: 1;
   max-width: 550px;
-  min-width: 420px;
-  background: white;
-  border-left: 1px solid var(--border-color);
+  min-width: 450px;
+  background: linear-gradient(135deg, #b4b0ec 0%, #8dd2d2 100%);
+  /* Deep Purple to Deep Maroon/Red */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px 60px;
-  /* Reduced padding */
+  padding: 20px 40px;
   z-index: 10;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  /* Prevent blobs from causing scrollbars */
+}
+
+/* Scrollable container for the form itself */
+.login-form-inner-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 40px 0;
+  /* Increased padding */
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Center horizontally */
+}
+
+.login-form-inner-wrapper::-webkit-scrollbar {
+  display: none;
+  /* Hide for Chrome/Safari */
+}
+
+/* Decorative Background Elements - Significantly More Saturated */
+.login-form-section::before,
+.login-form-section::after {
+  content: '';
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -1;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.login-form-section::before {
+  top: -150px;
+  right: -150px;
+  background: #7c3aed;
+  /* Vibrant Purple Blob */
+  animation: float-slow 8s infinite alternate;
+}
+
+.login-form-section::after {
+  bottom: -150px;
+  left: -150px;
+  background: #dc2626;
+  /* Strong Red Blob */
+  animation: float-slow 10s infinite alternate-reverse;
+}
+
+@keyframes float-slow {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(20px, 30px);
+  }
 }
 
 .login-card {
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin: auto;
+  /* Vertically and horizontally centers when content is small */
+  padding: 20px 0;
 }
 
 .login-header {
@@ -232,14 +296,14 @@
 
 .login-header h2 {
   font-size: 2rem;
-  color: #1f2937;
+  color: #ffffff;
   margin-bottom: 4px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .login-header p {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
 }
 
@@ -265,16 +329,16 @@
 }
 
 .form-group-modern label {
-  color: #4b5563;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
   font-weight: 600;
 }
 
 .form-group-modern input {
-  background: #f9fafb;
-  /* Very light gray */
-  border: 1px solid #e5e7eb;
-  color: #1f2937;
+  background: rgba(255, 255, 255, 0.05);
+  /* Stealth input */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   padding: 16px 20px;
   border-radius: 12px;
   font-size: 1.05rem;
@@ -283,10 +347,10 @@
 
 .form-group-modern input:focus {
   outline: none;
-  background: white;
-  border-color: #8b5cf6;
-  /* Light Purple border */
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ef4444;
+  /* Brand Red Focus */
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
   transform: translateY(-2px);
 }
 
@@ -320,7 +384,7 @@
 .login-footer {
   margin-top: 32px;
   text-align: center;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 1rem;
 }
 

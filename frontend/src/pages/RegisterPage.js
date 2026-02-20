@@ -136,155 +136,163 @@ export default function RegisterPage() {
 
       {/* Right Form Section */}
       <div className="login-form-section">
-        <div className="login-card" style={{ maxWidth: '100%' }}>
-          <div className="login-header" style={{ marginBottom: '20px' }}>
-            <div className="logo-icon" style={{ fontSize: '3rem' }}>🎓</div>
-            <h2>Create Account</h2>
-            <p>Get started with Campus-Help Desk</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="login-form" style={{ gap: '20px' }}>
-
-            {/* Name Row */}
-            <div className="form-row-modern">
-              <div className="form-group-modern">
-                <label htmlFor="firstName">First Name</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                  required
-                />
-              </div>
-              <div className="form-group-modern">
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                  required
-                />
-              </div>
+        <div className="login-form-inner-wrapper">
+          <div className="login-card" style={{ maxWidth: '100%' }}>
+            <div className="login-header" style={{ marginBottom: '16px' }}>
+              <div className="logo-icon" style={{ fontSize: '2.2rem' }}>🎓</div>
+              <h2>Create Account</h2>
+              <p>Get started with Campus-Help Desk</p>
             </div>
 
-            {/* Username & Phone Row */}
-            <div className="form-row-modern">
-              <div className="form-group-modern">
-                <label htmlFor="username">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Username"
-                  required
-                />
-              </div>
-              <div className="form-group-modern">
-                <label htmlFor="phone">Phone (Optional)</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Mobile number"
-                />
-              </div>
-            </div>
+            <form onSubmit={handleSubmit} className="login-form" style={{ gap: '16px' }}>
 
-            <div className="form-group-modern">
-              <label htmlFor="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="student@college.edu"
-                required
-              />
-            </div>
+              {/* Name Row */}
+              <div className="form-row-modern" style={{ gap: '12px' }}>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="firstName" style={{ fontSize: '0.8rem' }}>First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="First name"
+                    required
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="lastName" style={{ fontSize: '0.8rem' }}>Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Last name"
+                    required
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+              </div>
 
-            {/* Password Row */}
-            <div className="form-row-modern">
-              <div className="form-group-modern">
-                <label htmlFor="password">Password</label>
+              {/* Username & Phone Row */}
+              <div className="form-row-modern" style={{ gap: '12px' }}>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="username" style={{ fontSize: '0.8rem' }}>Username</label>
+                  <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder="Username"
+                    required
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="phone" style={{ fontSize: '0.8rem' }}>Phone (Optional)</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Mobile number"
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-modern" style={{ gap: '6px' }}>
+                <label htmlFor="email" style={{ fontSize: '0.8rem' }}>Email Address</label>
                 <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder="student@college.edu"
                   required
+                  style={{ padding: '12px 16px' }}
                 />
               </div>
-              <div className="form-group-modern">
-                <label htmlFor="confirmPassword">Confirm</label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-            </div>
 
-            {/* Role Selection */}
-            <div className="form-group-modern">
-              <label>I am joining as</label>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                {[
-                  { value: 'student', label: '🎓 Student', desc: 'Report campus issues' },
-                  { value: 'staff', label: '👔 Staff', desc: 'Report & track issues' },
-                ].map(opt => (
-                  <div
-                    key={opt.value}
-                    onClick={() => setFormData(p => ({ ...p, role: opt.value }))}
-                    style={{
-                      flex: 1,
-                      padding: '14px',
-                      border: formData.role === opt.value ? '2px solid #8b5cf6' : '2px solid #e5e7eb',
-                      borderRadius: '12px',
-                      cursor: 'pointer',
-                      background: formData.role === opt.value ? '#f5f3ff' : '#f9fafb',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{opt.label.split(' ')[0]}</div>
-                    <div style={{ fontWeight: 700, color: formData.role === opt.value ? '#8b5cf6' : '#374151', fontSize: '0.95rem' }}>
-                      {opt.label.split(' ').slice(1).join(' ')}
+              {/* Password Row */}
+              <div className="form-row-modern" style={{ gap: '12px' }}>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="password" style={{ fontSize: '0.8rem' }}>Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    required
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+                <div className="form-group-modern" style={{ gap: '6px' }}>
+                  <label htmlFor="confirmPassword" style={{ fontSize: '0.8rem' }}>Confirm</label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    required
+                    style={{ padding: '12px 16px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Role Selection */}
+              <div className="form-group-modern" style={{ gap: '6px' }}>
+                <label style={{ fontSize: '0.8rem' }}>I am joining as</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[
+                    { value: 'student', label: '🎓 Student', desc: 'Report issues' },
+                    { value: 'staff', label: '👔 Staff', desc: 'Manage issues' },
+                  ].map(opt => (
+                    <div
+                      key={opt.value}
+                      onClick={() => setFormData(p => ({ ...p, role: opt.value }))}
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: formData.role === opt.value ? '2px solid #8b5cf6' : '1px solid #e5e7eb',
+                        borderRadius: '12px',
+                        cursor: 'pointer',
+                        background: formData.role === opt.value ? '#f5f3ff' : '#f9fafb',
+                        transition: 'all 0.2s ease',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div style={{ fontSize: '1.2rem', marginBottom: '2px' }}>{opt.label.split(' ')[0]}</div>
+                      <div style={{ fontWeight: 800, color: formData.role === opt.value ? '#8b5cf6' : '#374151', fontSize: '0.85rem' }}>
+                        {opt.label.split(' ').slice(1).join(' ')}
+                      </div>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '2px' }}>{opt.desc}</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+
+              <button type="submit" className="btn-modern-primary" disabled={loading} style={{ padding: '14px', marginTop: '10px' }}>
+                {loading ? 'Creating Account...' : `Sign Up as ${formData.role === 'student' ? 'Student' : 'Staff'}`}
+              </button>
+            </form>
+
+            <div className="login-footer">
+              <p>
+                Already have an account?
+                <Link to="/login" className="link-modern">
+                  Login here
+                </Link>
+              </p>
             </div>
-
-            <button type="submit" className="btn-modern-primary" disabled={loading}>
-              {loading ? 'Creating Account...' : `Sign Up as ${formData.role === 'student' ? 'Student' : 'Staff'}`}
-            </button>
-          </form>
-
-          <div className="login-footer">
-            <p>
-              Already have an account?
-              <Link to="/login" className="link-modern">
-                Login here
-              </Link>
-            </p>
           </div>
         </div>
       </div>

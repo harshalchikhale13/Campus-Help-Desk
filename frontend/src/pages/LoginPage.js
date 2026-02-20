@@ -126,52 +126,54 @@ export default function LoginPage() {
 
       {/* Right Side - Login Form */}
       <div className="login-form-section">
-        <div className="login-card">
-          <div className="login-header">
-            <div className="logo-icon">🎓</div>
-            <h2>Campus-Help Desk</h2>
-            <p>Sanitizing your account access</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="form-group-modern">
-              <label>Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@college.edu"
-                required
-              />
+        <div className="login-form-inner-wrapper">
+          <div className="login-card">
+            <div className="login-header">
+              <div className="logo-icon">🎓</div>
+              <h2>Campus-Help Desk</h2>
+              <p>Sanitizing your account access</p>
             </div>
 
-            <div className="form-group-modern">
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="form-group-modern">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@college.edu"
+                  required
+                />
+              </div>
+
+              <div className="form-group-modern">
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <button type="submit" className="btn-modern-primary" disabled={loading}>
+                {loading ? <span className="spinner"></span> : 'Sign In'}
+              </button>
+            </form>
+
+            <div className="login-footer">
+              <p>New to Campus-Help?</p>
+              <Link to="/register" className="link-modern">Create an account</Link>
             </div>
 
-            <button type="submit" className="btn-modern-primary" disabled={loading}>
-              {loading ? <span className="spinner"></span> : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="login-footer">
-            <p>New to Campus-Help?</p>
-            <Link to="/register" className="link-modern">Create an account</Link>
-          </div>
-
-          <div className="demo-pills">
-            <small>Quick Login:</small>
-            <div className="pill-group">
-              <span onClick={() => { setEmail('citizen@example.com'); setPassword('Password123!') }}>Student</span>
-              <span onClick={() => { setEmail('admin@example.com'); setPassword('Password123!') }}>College Admin</span>
-              <span onClick={() => { setEmail('officer@example.com'); setPassword('Password123!') }}>Staff</span>
+            <div className="demo-pills">
+              <small>Quick Login:</small>
+              <div className="pill-group">
+                <span onClick={() => { setEmail('citizen@example.com'); setPassword('Password123!') }}>Student</span>
+                <span onClick={() => { setEmail('admin@example.com'); setPassword('Password123!') }}>College Admin</span>
+                <span onClick={() => { setEmail('officer@example.com'); setPassword('Password123!') }}>Staff</span>
+              </div>
             </div>
           </div>
         </div>
