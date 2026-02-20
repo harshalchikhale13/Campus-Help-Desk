@@ -41,8 +41,8 @@
     "is_active": true,
     "profile_image": null,
     "created_at": "2026-01-18T10:00:00.000Z",
-    "updated_at": "2026-02-20T10:20:37.034Z",
-    "last_login": "2026-02-20T10:20:37.034Z"
+    "updated_at": "2026-02-20T10:42:58.766Z",
+    "last_login": "2026-02-20T10:42:58.765Z"
   },
   {
     "id": 4,
@@ -141,8 +141,8 @@
     "role": "student",
     "is_active": true,
     "profile_image": null,
-    "last_login": "2026-02-20T10:21:00.635Z",
+    "last_login": "2026-02-20T10:42:52.585Z",
     "created_at": "2026-02-20T10:14:14.979Z",
-    "updated_at": "2026-02-20T10:21:00.636Z"
+    "updated_at": "2026-02-20T10:42:52.586Z"
   }
 ]
