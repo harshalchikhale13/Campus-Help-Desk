@@ -2,9 +2,7 @@
 node_modules/
 npm-debug.log*
 
-# Env files
-.env
-.env.local
+
 
 # Build
 build/
