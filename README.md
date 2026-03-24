@@ -1,81 +1,130 @@
-# Civic Complaint Management System
+# 🎓 Campus-Help Desk
 
-A comprehensive web-based civic complaint management system that enables citizens to report municipal issues and track their resolution through a centralized platform.
+Campus-Help Desk is a modern web-based campus issue management system that allows students and staff to report campus problems and enables administrators to manage, track, approve, and resolve them efficiently through a centralized dashboard.
+
+This system improves campus maintenance, transparency, and communication between students, staff, and administration.
+
+---
+
+## 🚀 Key Features
+
+### 👤 Role-Based Access Control
+
+The system supports three user roles:
+
+**🎓 Student**
+- Register and login securely
+- Report campus issues
+- Upload issue images
+- Track issue status in real time
+
+**👔 Staff**
+- Login securely
+- Report campus issues
+- Track reported issues
+
+**🛡️ Admin**
+- Full system control
+- Manage students and staff
+- Add / delete users
+- Activate / deactivate accounts
+- Approve or reject issues
+- View analytics and statistics
+- Track all system activity
+
+---
+
+## 📋 Campus Issue Management
+
+Users can report various campus issues such as:
+
+- Classroom Issues
+- Hostel Issues
+- Laboratory Issues
+- IT Support Problems
+- Library Issues
+- Internet / WiFi Issues
+- Electrical Problems
+- Cleanliness Issues
+- Infrastructure Issues
+- Other Campus Problems
+
+Each issue contains:
+
+- Unique Issue ID
+- Category
+- Description
+- Department
+- Location (Building and Room)
+- Priority Level
+- Image Upload Support
+- Status Tracking
+- Timestamp Information
+
+---
+
+## 🔄 Issue Workflow
+Submitted → Pending Approval → Approved → In Progress → Resolved → Closed
 
 
-# To Run The Project
-git clone <your-repo-url>
-cd complaint-system/backend
-npm install
-node server.js
+Admin controls approval, assignment, and resolution.
 
-cd ../frontend
-npm install
-npm start
+---
 
-## 🎯 Features
+## 📊 Admin Dashboard Features
 
-### User Authentication & Authorization
-- User registration and login with JWT tokens
-- Role-based access control (Citizen, Admin, Department Officer)
-- Secure password hashing with bcrypt
-- Session management
+Admin dashboard provides:
 
-### Complaint Management
-- Register complaints with:
-  - Category (Garbage, Road, Water, Electricity, Drainage, Public Safety, Other)
-  - Detailed description
-  - Image upload capability
-  - Geographic location (latitude & longitude)
-  - Auto-generated complaint ID
-- Complaint lifecycle: Submitted → Assigned → In Progress → Resolved → Closed
-- Real-time status tracking
-- Complaint history and updates
+- Total Issues
+- Pending Issues
+- In Progress Issues
+- Resolved Issues
+- Total Students
+- Total Staff
 
-### Admin & Department Dashboard
-- View all complaints with advanced filtering
-- Filter by: Status, Category, Department, Date, Priority
-- Assign complaints to departments
-- Update resolution status
-- View statistics and analytics
+Analytics include:
 
-### Notifications
-- Email notifications on complaint submission
-- Status update notifications
-- Resolution confirmation emails
-- In-app notification system
+- Pie Charts (User Distribution)
+- Bar Charts (Issue Statistics)
+- Category-wise Issue Analysis
 
-### Security Features
-- Input validation and sanitization
-- Protection against SQL Injection, XSS, CSRF
-- Rate limiting on authentication endpoints
-- Helmet.js for security headers
-- CORS configuration
+---
 
-## 🛠️ Technical Stack
+## 👥 User Management
+
+Admin can fully manage users:
+
+- View all students and staff
+- Register new students or staff
+- Delete users
+- Activate / deactivate accounts
+- Track user registrations
+- Monitor account activity
+
+---
+
+## 🛠️ Technology Stack
 
 ### Frontend
-- **Framework**: React.js (v18)
-- **Styling**: CSS3 with responsive design
-- **Routing**: React Router v6
-- **HTTP Client**: Axios
-- **State Management**: React Context API
-- **Notifications**: React-Toastify
+- React.js
+- CSS3
+- Axios
+- React Router
+- Context API
+- Recharts
 
 ### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: PostgreSQL
-- **Authentication**: JWT
-- **Password Hashing**: bcryptjs
-- **Email**: Nodemailer
-- **Validation**: express-validator
-- **Security**: Helmet, CORS, Rate Limiting
+- Node.js
+- Express.js
+- JWT Authentication
+- bcrypt Password Hashing
+- JSON-based Storage
 
-### Database
-- PostgreSQL with connection pooling
-- Automated timestamp management
-- Optimized indexes for performance
+---
+
+## 📂 Project Structure
+
+
 
 ## 📂 Project Structure
 
@@ -215,23 +264,6 @@ complaint-system/
    
    App runs on `http://localhost:3000`
 
-## 📡 API Endpoints
-
-### Authentication
-- `POST /api/users/register` - Register new user
-- `POST /api/users/login` - Login user
-- `GET /api/users/profile` - Get current user profile
-- `PUT /api/users/profile` - Update user profile
-
-### Complaints
-- `POST /api/complaints` - Create new complaint
-- `GET /api/complaints` - Get all complaints (with filters)
-- `GET /api/complaints/:id` - Get complaint details
-- `GET /api/complaints/:id/history` - Get complaint history
-- `PUT /api/complaints/:id/status` - Update complaint status (Admin/Officer)
-- `POST /api/complaints/:id/updates` - Add complaint update
-- `GET /api/complaints/stats/overview` - Get statistics
-
 ### Notifications
 - `GET /api/notifications` - Get user notifications
 - `PUT /api/notifications/:id/read` - Mark notification as read
@@ -251,52 +283,7 @@ The application implements multiple security layers:
 9. **Security Headers**: Helmet.js middleware
 10. **RBAC**: Role-based access control on all protected routes
 
-## 📊 Database Schema
 
-### Users Table
-- Stores user information with roles (citizen, admin, department_officer)
-- Password hashing for security
-- Profile tracking
-
-### Complaints Table
-- Main complaint records with auto-generated ID
-- Category, priority, and status tracking
-- Location data (lat/long)
-- Assignment to departments
-
-### Complaint_Updates Table
-- Tracks all status changes and updates
-- Maintains complaint history
-- User and timestamp audit trail
-
-### Notifications Table
-- Stores notifications for users
-- Read/unread status
-- Tracks email sending
-
-### Departments Table
-- Lists all departments
-- Contact information
-
-## 🧪 Demo Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Citizen | citizen@example.com | Password123! |
-| Admin | admin@example.com | Admin123! |
-
-## 📈 Future Enhancements
-
-- AI-based complaint categorization
-- Predictive analytics for resolution times
-- Chatbot integration for instant support
-- Mobile app version (iOS/Android)
-- Multilingual support
-- Advanced mapping with heat maps
-- SMS notifications
-- Payment integration for premium services
-- Document upload capabilities
-- Integration with external APIs (weather, traffic, etc.)
 
 ## 🤝 Contributing
 
@@ -320,8 +307,3 @@ For issues, questions, or suggestions:
 ## 👥 Team
 
 - **DevOps Engineer**: Harshal Chikhale
-
-
----
-
-**Last Updated**: January 18, 2026
