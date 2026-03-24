@@ -339,5 +339,49 @@
     "is_read": false,
     "email_sent": false,
     "created_at": "2026-02-20T09:56:23.715Z"
+  },
+  {
+    "id": 32,
+    "user_id": 3,
+    "complaint_id": 4,
+    "type": "update",
+    "title": "Complaint Status Updated",
+    "message": "Your complaint (ID: ISS-20260219-004) status has been updated to: closed",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-03-07T05:31:45.455Z"
+  },
+  {
+    "id": 33,
+    "user_id": 1,
+    "complaint_id": 12,
+    "type": "update",
+    "title": "Complaint Status Updated",
+    "message": "Your complaint (ID: CMP-MLUPTC55-MG9S2T) status has been updated to: in_progress",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-03-07T05:31:53.883Z"
+  },
+  {
+    "id": 34,
+    "user_id": 3,
+    "complaint_id": 9,
+    "type": "update",
+    "title": "Complaint Status Updated",
+    "message": "Your complaint (ID: CMP-MLTFZBO0-ABH7XG) status has been updated to: in_progress",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-03-07T05:32:01.379Z"
+  },
+  {
+    "id": 35,
+    "user_id": 1,
+    "complaint_id": 12,
+    "type": "update",
+    "title": "Complaint Status Updated",
+    "message": "Your complaint (ID: CMP-MLUPTC55-MG9S2T) status has been updated to: closed",
+    "is_read": false,
+    "email_sent": false,
+    "created_at": "2026-03-24T06:06:37.521Z"
   }
 ]
