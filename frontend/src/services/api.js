@@ -4,7 +4,13 @@
  */
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+let API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+// Safety net: If the GitLab variable was saved without port 5000, forcefully add it so the user isn't stuck!
+if (!API_URL.includes(':5000') && API_URL.includes('amazonaws.com')) {
+  API_URL = API_URL.replace('.amazonaws.com/api', '.amazonaws.com:5000/api');
+}
+
 console.log('🚨 URGENT DEBUG: React is trying to contact the Backend at:', API_URL);
 
 // Create axios instance
