@@ -11,7 +11,7 @@ metadata:
   name: backend
   namespace: campus-help-desk
 spec:
-  replicas: 10
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -70,7 +70,7 @@ metadata:
   name: frontend
   namespace: campus-help-desk
 spec:
-  replicas: 5
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
