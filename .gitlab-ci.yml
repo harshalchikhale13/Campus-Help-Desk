@@ -92,7 +92,9 @@ build_frontend_image:
 # ===========================
 deploy_eks:
   stage: deploy-eks
-  image: amazon/aws-cli:latest
+  image: 
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
   before_script:
     - "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
     - "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
