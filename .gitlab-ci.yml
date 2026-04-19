@@ -45,7 +45,7 @@ install_dependencies:
     - echo "📦 Installing backend dependencies..."
     - cd backend && npm ci
     - echo "📦 Installing frontend dependencies..."
-    - cd ../frontend && npm ci
+    - cd ../frontend && npm install
 
 # =====================
 #  STAGE 2 — TEST
