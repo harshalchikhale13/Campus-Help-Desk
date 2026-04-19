@@ -114,31 +114,20 @@ deploy_eks:
   stage: deploy-eks
   image: amazon/aws-cli:latest
   before_script:
-    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-    - export AWS_DEFAULT_REGION=$AWS_REGION
-    
-    # Install kubectl
-    - curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/linux/amd64/kubectl
-    - chmod +x ./kubectl
-    - mv ./kubectl /usr/local/bin/kubectl
-    
-    # Configure kubeconfig for EKS
-    - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+    - "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+    - "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+    - "export AWS_DEFAULT_REGION=$AWS_REGION"
+    - "curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/linux/amd64/kubectl"
+    - "chmod +x ./kubectl"
+    - "mv ./kubectl /usr/local/bin/kubectl"
+    - "aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION"
   script:
-    - echo "🚀 Deploying to AWS EKS..."
-    
-    # Update manifest to use the newly pushed image
-    - sed -i "s|<YOUR_REGISTRY_URL>/campus-help-backend:latest|$BACKEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml
-    - sed -i "s|<YOUR_REGISTRY_URL>/campus-help-frontend:latest|$FRONTEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml
-    
-    # Apply to cluster
-    - kubectl apply -f k8s/deployment.yaml
-    
-    # Restart pods to enforce fresh pull (optional if tags are correctly substituted)
-    - kubectl rollout restart deployment/backend -n campus-help-desk
-    - kubectl rollout restart deployment/frontend -n campus-help-desk
-    
-    - echo "✅ Deployment initiated. Check pod status with: kubectl get pods -n campus-help-desk"
+    - 'echo "Deploying to AWS EKS..."'
+    - 'sed -i "s|<YOUR_REGISTRY_URL>/campus-help-backend:latest|$BACKEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml'
+    - 'sed -i "s|<YOUR_REGISTRY_URL>/campus-help-frontend:latest|$FRONTEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml'
+    - 'kubectl apply -f k8s/deployment.yaml'
+    - 'kubectl rollout restart deployment/backend -n campus-help-desk || true'
+    - 'kubectl rollout restart deployment/frontend -n campus-help-desk || true'
+    - 'echo "Deployment initiated successfully!"'
   only:
     - main
