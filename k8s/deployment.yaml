@@ -13,7 +13,7 @@ metadata:
   name: backend
   namespace: campus-help-desk
 spec:
-  replicas: 2
+  replicas: 3
   strategy:
     blueGreen:
       # Nginx routes active public traffic here
@@ -96,7 +96,7 @@ metadata:
   name: frontend
   namespace: campus-help-desk
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
