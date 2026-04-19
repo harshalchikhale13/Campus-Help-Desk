@@ -33,7 +33,7 @@ spec:
       containers:
       - name: backend
         # Note: Replace this with your actual Amazon ECR / GitLab Registry image URL
-        image: <YOUR_REGISTRY_URL>/campus-help-backend:latest
+        image: 378780514304.dkr.ecr.ap-south-1.amazonaws.com/campus-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
@@ -108,7 +108,7 @@ spec:
       containers:
       - name: frontend
         # Note: Replace this with your actual Amazon ECR / GitLab Registry image URL
-        image: <YOUR_REGISTRY_URL>/campus-help-frontend:latest
+        image: 378780514304.dkr.ecr.ap-south-1.amazonaws.com/campus-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
