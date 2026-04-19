@@ -69,12 +69,25 @@ app.get('/', (req, res) => {
   res.send('City Help Desk Backend is running');
 });
 
-app.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Check database connectivity
+    const db = require('./config/database');
+    await db.query('SELECT 1');
+    res.json({
+      success: true,
+      message: 'Server is running',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(503).json({
+      success: false,
+      message: 'Server is running but database is unreachable',
+      database: 'disconnected',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ========== API ROUTES ==========

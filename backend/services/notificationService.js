@@ -1,5 +1,5 @@
 /**
- * Notification Service - JSON Storage Version
+ * Notification Service — PostgreSQL Version
  * Handles sending notifications (in-app only, email optional)
  */
 const nodemailer = require('nodemailer');
@@ -24,17 +24,14 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER) {
  */
 const saveNotification = async (userId, complaintId, type, title, message) => {
   try {
-    const notification = db.insert('notifications.json', {
-      user_id: userId,
-      complaint_id: complaintId,
-      type,
-      title,
-      message,
-      is_read: false,
-      email_sent: false,
-    });
+    const result = await db.query(
+      `INSERT INTO notifications (user_id, complaint_id, type, title, message, is_read, email_sent)
+       VALUES ($1, $2, $3, $4, $5, false, false)
+       RETURNING *`,
+      [userId, complaintId, type, title, message]
+    );
 
-    return notification;
+    return result.rows[0];
   } catch (error) {
     console.error('Error saving notification:', error);
     throw error;
@@ -71,7 +68,8 @@ const sendEmailNotification = async (email, subject, htmlContent) => {
  */
 const notifyComplaintSubmission = async (userId, complaintData) => {
   try {
-    const user = db.findById('users.json', userId);
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = userResult.rows[0];
 
     if (!user) return;
 
@@ -106,8 +104,11 @@ const notifyComplaintSubmission = async (userId, complaintData) => {
  */
 const notifyComplaintAssignment = async (userId, complaintData, departmentId) => {
   try {
-    const user = db.findById('users.json', userId);
-    const department = db.findById('departments.json', departmentId);
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = userResult.rows[0];
+
+    const deptResult = await db.query('SELECT * FROM departments WHERE id = $1', [departmentId]);
+    const department = deptResult.rows[0];
 
     if (!user || !department) return;
 
@@ -142,7 +143,8 @@ const notifyComplaintAssignment = async (userId, complaintData, departmentId) =>
  */
 const notifyComplaintUpdate = async (userId, complaintData, newStatus) => {
   try {
-    const user = db.findById('users.json', userId);
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = userResult.rows[0];
 
     if (!user) return;
 
@@ -176,16 +178,22 @@ const notifyComplaintUpdate = async (userId, complaintData, newStatus) => {
  */
 const getUserNotifications = async (userId, limit = 20, offset = 0) => {
   try {
-    let notifications = db.find('notifications.json', { user_id: userId });
+    const countResult = await db.query(
+      'SELECT COUNT(*) FROM notifications WHERE user_id = $1',
+      [userId]
+    );
+    const total = parseInt(countResult.rows[0].count);
 
-    // Sort by created_at descending
-    notifications = notifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    const total = notifications.length;
-    const paginatedNotifications = notifications.slice(offset, offset + limit);
+    const result = await db.query(
+      `SELECT * FROM notifications
+       WHERE user_id = $1
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [userId, limit, offset]
+    );
 
     return {
-      notifications: paginatedNotifications,
+      notifications: result.rows,
       total,
       limit,
       offset,
@@ -201,17 +209,16 @@ const getUserNotifications = async (userId, limit = 20, offset = 0) => {
  */
 const markNotificationAsRead = async (notificationId) => {
   try {
-    const notification = db.findById('notifications.json', notificationId);
+    const result = await db.query(
+      `UPDATE notifications SET is_read = true WHERE id = $1 RETURNING *`,
+      [notificationId]
+    );
 
-    if (!notification) {
+    if (result.rows.length === 0) {
       throw new Error('Notification not found');
     }
 
-    const updated = db.updateById('notifications.json', notificationId, {
-      is_read: true,
-    });
-
-    return updated;
+    return result.rows[0];
   } catch (error) {
     console.error('Error marking notification as read:', error);
     throw error;

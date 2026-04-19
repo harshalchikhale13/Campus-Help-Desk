@@ -1,5 +1,5 @@
 /**
- * User Service - JSON Storage Version
+ * User Service — PostgreSQL Version
  * Business logic for user operations
  */
 const db = require('../config/database');
@@ -24,8 +24,11 @@ const registerUser = async (userData) => {
 
   try {
     // Check if user already exists
-    const existingUser = db.findOne('users.json', { email }) || db.findOne('users.json', { username });
-    if (existingUser) {
+    const existing = await db.query(
+      'SELECT id FROM users WHERE email = $1 OR username = $2',
+      [email, username]
+    );
+    if (existing.rows.length > 0) {
       throw new Error('Email or username already registered');
     }
 
@@ -33,18 +36,14 @@ const registerUser = async (userData) => {
     const hashedPassword = await hashPassword(password);
 
     // Insert user
-    const user = db.insert('users.json', {
-      username,
-      email,
-      password: hashedPassword,
-      first_name: firstName,
-      last_name: lastName,
-      phone,
-      role,
-      is_active: true,
-      profile_image: null,
-      last_login: new Date().toISOString(),
-    });
+    const result = await db.query(
+      `INSERT INTO users (username, email, password, first_name, last_name, phone, role, is_active, last_login)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())
+       RETURNING id, username, email, first_name, last_name, phone, role, created_at`,
+      [username, email, hashedPassword, firstName, lastName, phone, role]
+    );
+
+    const user = result.rows[0];
 
     const token = generateToken({
       id: user.id,
@@ -75,7 +74,8 @@ const registerUser = async (userData) => {
  * Login user
  */
 const loginUser = async (email, password) => {
-  const user = db.findOne('users.json', { email });
+  const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+  const user = result.rows[0];
 
   if (!user) {
     throw new Error('Invalid email or password');
@@ -91,9 +91,7 @@ const loginUser = async (email, password) => {
   }
 
   // Update last login
-  db.updateById('users.json', user.id, {
-    last_login: new Date().toISOString(),
-  });
+  await db.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
 
   const token = generateToken({
     id: user.id,
@@ -120,7 +118,8 @@ const loginUser = async (email, password) => {
  * Get user by ID
  */
 const getUserById = async (userId) => {
-  const user = db.findById('users.json', userId);
+  const result = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+  const user = result.rows[0];
 
   if (!user) {
     throw new Error('User not found');
@@ -145,18 +144,22 @@ const getUserById = async (userId) => {
  */
 const updateUserProfile = async (userId, updateData) => {
   const { firstName, lastName, phone, profileImage } = updateData;
-  const user = db.findById('users.json', userId);
 
-  if (!user) {
+  const result = await db.query(
+    `UPDATE users
+     SET first_name  = COALESCE($1, first_name),
+         last_name   = COALESCE($2, last_name),
+         phone       = COALESCE($3, phone),
+         profile_image = COALESCE($4, profile_image)
+     WHERE id = $5
+     RETURNING id, username, email, first_name, last_name, phone, role`,
+    [firstName, lastName, phone, profileImage, userId]
+  );
+
+  const updated = result.rows[0];
+  if (!updated) {
     throw new Error('User not found');
   }
-
-  const updated = db.updateById('users.json', userId, {
-    first_name: firstName || user.first_name,
-    last_name: lastName || user.last_name,
-    phone: phone || user.phone,
-    profile_image: profileImage || user.profile_image,
-  });
 
   return {
     id: updated.id,
@@ -173,17 +176,33 @@ const updateUserProfile = async (userId, updateData) => {
  * Get all users (Admin only)
  */
 const getAllUsers = async (limit = 20, offset = 0, role = null) => {
-  let users = db.getAll('users.json');
+  let queryText;
+  let params;
 
   if (role) {
-    users = users.filter((u) => u.role === role);
+    queryText = `SELECT id, username, email, first_name, last_name, phone, role, is_active, created_at
+                 FROM users WHERE role = $1
+                 ORDER BY created_at DESC
+                 LIMIT $2 OFFSET $3`;
+    params = [role, limit, offset];
+  } else {
+    queryText = `SELECT id, username, email, first_name, last_name, phone, role, is_active, created_at
+                 FROM users
+                 ORDER BY created_at DESC
+                 LIMIT $1 OFFSET $2`;
+    params = [limit, offset];
   }
 
-  const total = users.length;
-  const paginatedUsers = users.slice(offset, offset + limit);
+  const result = await db.query(queryText, params);
+
+  // Get total count
+  const countQuery = role
+    ? await db.query('SELECT COUNT(*) FROM users WHERE role = $1', [role])
+    : await db.query('SELECT COUNT(*) FROM users');
+  const total = parseInt(countQuery.rows[0].count);
 
   return {
-    users: paginatedUsers.map((u) => ({
+    users: result.rows.map((u) => ({
       id: u.id,
       username: u.username,
       email: u.email,
@@ -204,12 +223,14 @@ const getAllUsers = async (limit = 20, offset = 0, role = null) => {
  * Toggle user active status (Admin only)
  */
 const toggleUserStatus = async (userId) => {
-  const user = db.findById('users.json', parseInt(userId));
-  if (!user) throw new Error('User not found');
+  const result = await db.query(
+    `UPDATE users SET is_active = NOT is_active WHERE id = $1
+     RETURNING id, username, email, first_name, last_name, role, is_active`,
+    [parseInt(userId)]
+  );
 
-  const updated = db.updateById('users.json', user.id, {
-    is_active: !user.is_active,
-  });
+  const updated = result.rows[0];
+  if (!updated) throw new Error('User not found');
 
   return {
     id: updated.id,
@@ -226,11 +247,14 @@ const toggleUserStatus = async (userId) => {
  * Delete user (Admin only)
  */
 const deleteUser = async (userId) => {
-  const user = db.findById('users.json', parseInt(userId));
+  const findResult = await db.query('SELECT * FROM users WHERE id = $1', [parseInt(userId)]);
+  const user = findResult.rows[0];
+
   if (!user) throw new Error('User not found');
   if (user.role === 'admin') throw new Error('Cannot delete admin accounts');
-  const deleted = db.deleteById('users.json', user.id);
-  if (!deleted) throw new Error('Failed to delete user');
+
+  await db.query('DELETE FROM users WHERE id = $1', [user.id]);
+
   return { id: user.id, username: user.username, email: user.email };
 };
 

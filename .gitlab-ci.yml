@@ -1,0 +1,138 @@
+# ============================================
+# GitLab CI/CD Pipeline — Docker + Kubernetes
+# ============================================
+
+stages:
+  - install
+  - test
+  - build-docker
+  - deploy-eks
+
+variables:
+  # Tag images with the commit SHA for traceability
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  
+  # For ECR (Amazon Elastic Container Registry)
+  BACKEND_IMAGE: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/campus-backend
+  FRONTEND_IMAGE: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/campus-frontend
+  
+  # For Docker-in-Docker functionality in GitLab CI
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+# Cache node_modules between jobs
+.cache_template: &cache_template
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+        - backend/package-lock.json
+    paths:
+      - frontend/node_modules/
+      - backend/node_modules/
+    policy: pull
+
+# =====================
+#  STAGE 1 — INSTALL
+# =====================
+install_dependencies:
+  stage: install
+  image: node:18-alpine
+  <<: *cache_template
+  cache:
+    policy: pull-push
+  script:
+    - echo "📦 Installing backend dependencies..."
+    - cd backend && npm ci
+    - echo "📦 Installing frontend dependencies..."
+    - cd ../frontend && npm ci
+
+# =====================
+#  STAGE 2 — TEST
+# =====================
+test_backend:
+  stage: test
+  image: node:18-alpine
+  <<: *cache_template
+  script:
+    - echo "🧪 Running backend tests..."
+    - cd backend
+    - npm test -- --passWithNoTests
+
+test_frontend:
+  stage: test
+  image: node:18-alpine
+  <<: *cache_template
+  script:
+    - echo "🧪 Running frontend tests..."
+    - cd frontend
+    - npm test -- --watchAll=false --passWithNoTests
+
+# ===========================
+#  STAGE 3 — BUILD DOCKER
+# ===========================
+build_backend_image:
+  stage: build-docker
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - apk add --no-cache aws-cli
+    # Log in to Amazon ECR
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  script:
+    - echo "🏗️ Building backend Docker image..."
+    - cd backend
+    - docker build -t $BACKEND_IMAGE:$IMAGE_TAG -t $BACKEND_IMAGE:latest .
+    - docker push $BACKEND_IMAGE:$IMAGE_TAG
+    - docker push $BACKEND_IMAGE:latest
+  only:
+    - main
+
+build_frontend_image:
+  stage: build-docker
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - apk add --no-cache aws-cli
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+  script:
+    - echo "🏗️ Building frontend Docker image..."
+    - cd frontend
+    # Note: Pass the intended API Gateway / Backend LoadBalancer URL here!
+    - docker build --build-arg REACT_APP_API_URL=$FRONTEND_API_URL -t $FRONTEND_IMAGE:$IMAGE_TAG -t $FRONTEND_IMAGE:latest .
+    - docker push $FRONTEND_IMAGE:$IMAGE_TAG
+    - docker push $FRONTEND_IMAGE:latest
+  only:
+    - main
+
+# ===========================
+#  STAGE 4 — DEPLOY TO EKS
+# ===========================
+deploy_eks:
+  stage: deploy-eks
+  image: bitnami/kubectl:latest
+  before_script:
+    - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - export AWS_DEFAULT_REGION=$AWS_REGION
+    # Configure kubeconfig for EKS
+    - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+  script:
+    - echo "🚀 Deploying to AWS EKS..."
+    
+    # Update manifest to use the newly pushed image
+    - sed -i "s|<YOUR_REGISTRY_URL>/campus-help-backend:latest|$BACKEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml
+    - sed -i "s|<YOUR_REGISTRY_URL>/campus-help-frontend:latest|$FRONTEND_IMAGE:$IMAGE_TAG|g" k8s/deployment.yaml
+    
+    # Apply to cluster
+    - kubectl apply -f k8s/deployment.yaml
+    
+    # Restart pods to enforce fresh pull (optional if tags are correctly substituted)
+    - kubectl rollout restart deployment/backend -n campus-help-desk
+    - kubectl rollout restart deployment/frontend -n campus-help-desk
+    
+    - echo "✅ Deployment initiated. Check pod status with: kubectl get pods -n campus-help-desk"
+  only:
+    - main
