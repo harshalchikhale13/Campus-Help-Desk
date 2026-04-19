@@ -4,14 +4,24 @@ metadata:
   name: campus-help-desk
 
 ---
-# Backend Deployment
-apiVersion: apps/v1
-kind: Deployment
+# -----------------------------------
+# Backend Blue/Green Rollout
+# -----------------------------------
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: backend
   namespace: campus-help-desk
 spec:
   replicas: 2
+  strategy:
+    blueGreen:
+      # Nginx routes active public traffic here
+      activeService: backend-service
+      # New container starts here first for testing
+      previewService: backend-preview
+      # Requires physical human approval via ArgoCD before destroying old version!
+      autoPromotionEnabled: false 
   selector:
     matchLabels:
       app: backend
@@ -44,7 +54,7 @@ spec:
           periodSeconds: 10
 
 ---
-# Backend Service (Publicly exposes the backend API)
+# Core Backend Service (Live Production Traffic)
 apiVersion: v1
 kind: Service
 metadata:
@@ -55,6 +65,22 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
 spec:
   type: LoadBalancer
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+
+---
+# Preview Backend Service (For testing Green before promotion)
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-preview
+  namespace: campus-help-desk
+spec:
+  type: ClusterIP
   selector:
     app: backend
   ports:
