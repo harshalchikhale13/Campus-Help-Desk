@@ -5,7 +5,7 @@ metadata:
 
 ---
 # -----------------------------------
-# Backend Blue/Green Rollout
+# Backend Canary Rollout
 # -----------------------------------
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
@@ -15,13 +15,17 @@ metadata:
 spec:
   replicas: 3
   strategy:
-    blueGreen:
-      # Nginx routes active public traffic here
-      activeService: backend-service
-      # New container starts here first for testing
-      previewService: backend-preview
-      # Requires physical human approval via ArgoCD before destroying old version!
-      autoPromotionEnabled: true 
+    canary:
+      steps:
+      # Step 1: Send 33% of public traffic to the new Green pod (1 Green Pod, 2 Blue Pods)
+      - setWeight: 33
+      # Step 2: Pause the deployment physically so you can test if users complain. You must click Promote!
+      - pause: {}
+      # Step 3: Shift traffic to 66% (2 Green Pods, 1 Blue Pod)
+      - setWeight: 66
+      # Step 4: Automatically wait 60 seconds to monitor it, then naturally proceed to 100%
+      - pause: {duration: 60s}
+      - setWeight: 100 
   selector:
     matchLabels:
       app: backend
