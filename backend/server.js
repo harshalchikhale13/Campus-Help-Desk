@@ -28,7 +28,10 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Dynamically mirror the origin to allow the AWS LoadBalancer frontend to connect
+    callback(null, true);
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 }));
