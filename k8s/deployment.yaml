@@ -21,7 +21,7 @@ spec:
       # New container starts here first for testing
       previewService: backend-preview
       # Requires physical human approval via ArgoCD before destroying old version!
-      autoPromotionEnabled: false 
+      autoPromotionEnabled: true 
   selector:
     matchLabels:
       app: backend
