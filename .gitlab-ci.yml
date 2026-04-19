@@ -112,11 +112,17 @@ build_frontend_image:
 # ===========================
 deploy_eks:
   stage: deploy-eks
-  image: bitnami/kubectl:latest
+  image: amazon/aws-cli:latest
   before_script:
     - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
     - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     - export AWS_DEFAULT_REGION=$AWS_REGION
+    
+    # Install kubectl
+    - curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.28.3/2023-11-14/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+    
     # Configure kubeconfig for EKS
     - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
   script:
